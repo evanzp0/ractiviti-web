@@ -8,7 +8,7 @@ async fn main() {
 
     // build route
     let app = Router::new()
-        .route("/", get(handler))
+        .route("/", get(root))
         .route("/robots.txt", get_service(ServeFile::new("./web/robots.txt")).handle_error(handle_static_error))
         .nest("/assets", get_service(ServeDir::new("./web/assets")).handle_error(handle_static_error))
         .fallback(handler_404.into_service());
@@ -22,7 +22,7 @@ async fn main() {
         .unwrap();
 }
 
-async fn handler() -> Html<&'static str> {
+async fn root() -> Html<&'static str> {
     Html("<h1>Hello, World!</h1>")
 }
 
