@@ -1,4 +1,6 @@
-use axum::{http::StatusCode, response::{Html, IntoResponse}, handler::Handler, routing::get, Router,};
+use std::io;
+use axum::{http::StatusCode, response::{Html, IntoResponse}, handler::Handler, routing::{get, get_service}, Router,};
+use tower_http::services::{ServeDir, ServeFile};
 
 #[tokio::main]
 async fn main() {
@@ -7,6 +9,8 @@ async fn main() {
     // build route
     let app = Router::new()
         .route("/", get(handler))
+        .route("/robots.txt", get_service(ServeFile::new("./web/robots.txt")).handle_error(handle_static_error))
+        .nest("/assets", get_service(ServeDir::new("./web/assets")).handle_error(handle_static_error))
         .fallback(handler_404.into_service());
 
     // run it
@@ -20,6 +24,10 @@ async fn main() {
 
 async fn handler() -> Html<&'static str> {
     Html("<h1>Hello, World!</h1>")
+}
+
+async fn handle_static_error(_err: io::Error) -> impl IntoResponse {
+    (StatusCode::INTERNAL_SERVER_ERROR, "Something went wrong...")
 }
 
 async fn handler_404() -> impl IntoResponse {
