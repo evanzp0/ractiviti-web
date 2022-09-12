@@ -468,6 +468,8 @@ name = "ractiviti-web"
 version = "0.1.0"
 dependencies = [
  "axum",
+ "hyper",
+ "pin-project-lite",
  "serde",
  "serde_json",
  "tokio",

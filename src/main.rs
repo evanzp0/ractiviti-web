@@ -2,7 +2,7 @@ mod handles;
 
 use axum::{Router, routing::{get, get_service}, middleware::from_fn};
 use tower_http::services::{ServeFile, ServeDir};
-use crate::handles::common_handles::{root, handle_static_error, mid_handler_404};
+use crate::handles::{common_handles::{root, handle_static_error, mid_handler_404}, hello_service::HelloLayer};
 
 #[tokio::main]
 async fn main() 
@@ -16,6 +16,8 @@ async fn main()
             get_service(ServeFile::new("./web/robots.txt")).handle_error(handle_static_error))
         .nest("/assets",
             get_service(ServeDir::new("./web/assets")).handle_error(handle_static_error),)
+        .layer(HelloLayer::new())
+        // .layer(ConcurrencyLimitLayer::new(64))
         .layer(from_fn(mid_handler_404));
 
     // run it
@@ -26,7 +28,6 @@ async fn main()
         .await
         .unwrap();
 }
-
 
 pub fn set_working_dir() 
 {
