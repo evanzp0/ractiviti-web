@@ -17,7 +17,6 @@ async fn main()
         .nest("/assets",
             get_service(ServeDir::new("./web/assets")).handle_error(handle_static_error),)
         .layer(HelloLayer::new())
-        // .layer(ConcurrencyLimitLayer::new(64))
         .layer(from_fn(mid_handler_404));
 
     // run it
