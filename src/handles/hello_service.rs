@@ -65,7 +65,7 @@ where
 }
 
 pin_project! {
-#[derive(Debug)]
+    #[derive(Debug)]
     pub struct HelloFuture<T> {
         #[pin]
         inner: T,
