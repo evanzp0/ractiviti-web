@@ -1,4 +1,10 @@
-use axum::{http::{Request, StatusCode, Response}, middleware::Next, response::{IntoResponse, Html}, body::Body};
+use axum::{
+    http::{Request, StatusCode, Response}, 
+    middleware::Next, 
+    response::{IntoResponse, Html}, 
+    body::Body, Json
+};
+use serde::{Deserialize, Serialize};
 use tower::ServiceExt;
 use tower_http::services::ServeFile;
 
@@ -35,4 +41,26 @@ pub async fn root() -> Html<&'static str>
 pub async fn handle_static_error(_err: std::io::Error) -> impl IntoResponse 
 {
     (StatusCode::INTERNAL_SERVER_ERROR, "Something went wrong...")
+}
+
+pub async fn login(Json(payload): Json<LoginData>) -> impl IntoResponse {
+    let login_result = LoginResult {
+        id: "1337".to_owned(),
+        username: payload.username,
+        is_pass: true
+    };
+
+    (StatusCode::OK, Json(login_result))
+}
+
+#[derive(Deserialize)]
+pub struct LoginData {
+    username: String,
+}
+
+#[derive(Serialize)]
+pub struct LoginResult {
+    id: String,
+    username: String,
+    is_pass: bool,
 }

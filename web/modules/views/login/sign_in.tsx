@@ -11,6 +11,8 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import ILoginData from '../../models/login_data';
+import LoginService from '../../services/login_service';
 
 function Copyright(props: any) {
     return (
@@ -28,14 +30,27 @@ function Copyright(props: any) {
 
 const theme = createTheme();
 
+// type State = ILoginData & {
+//     submitted: boolean
+// };
+
 export default function SignIn() {
-    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    const handleLogin = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         const data = new FormData(event.currentTarget);
-        console.log({
-            user_name: data.get('user_name'),
-            password: data.get('password'),
-        });
+        let loginData: ILoginData = {
+            user_name: data.get('user_name')!.toString(),
+            password: data.get('password')!.toString(),
+        };
+        console.log(loginData);
+
+        LoginService.login(loginData)
+            .then((response: any) => {
+                console.log(response.data);
+            })
+            .catch((e:Error) => {
+                console.log(e);
+            })
     };
 
     return (
@@ -56,7 +71,7 @@ export default function SignIn() {
                     <Typography component="h1" variant="h5">
                         登入
                     </Typography>
-                    <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
+                    <Box component="form" onSubmit={handleLogin} noValidate sx={{ mt: 1 }}>
                         <TextField
                             margin="normal"
                             required
