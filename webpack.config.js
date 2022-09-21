@@ -40,7 +40,7 @@ module.exports = {
         ]
     },
     plugins: [
-        new HtmlWebpackPlugin(htmlpack_option('home', './web/modules/home/index.html')),
+        new HtmlWebpackPlugin(htmlpack_option('home', './web/modules/template/index.html')),
         new HtmlWebpackPlugin(htmlpack_option('login', './web/modules/login/index.html')),
         new CopyPlugin({
             patterns: [
