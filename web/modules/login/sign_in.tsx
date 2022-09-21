@@ -33,8 +33,8 @@ export default function SignIn() {
         event.preventDefault();
         const data = new FormData(event.currentTarget);
         console.log({
-        email: data.get('email'),
-        password: data.get('password'),
+            email: data.get('email'),
+            password: data.get('password'),
         });
     };
 
@@ -43,12 +43,12 @@ export default function SignIn() {
         <Container component="main" maxWidth="xs">
             <CssBaseline />
             <Box
-            sx={{
-                marginTop: 8,
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-            }}
+                sx={{
+                    marginTop: 8,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                }}
             >
             <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
                 <LockOutlinedIcon />
@@ -58,34 +58,34 @@ export default function SignIn() {
             </Typography>
             <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
                 <TextField
-                margin="normal"
-                required
-                fullWidth
-                id="email"
-                label="Email Address"
-                name="email"
-                autoComplete="email"
-                autoFocus
+                    margin="normal"
+                    required
+                    fullWidth
+                    id="email"
+                    label="Email Address"
+                    name="email"
+                    autoComplete="email"
+                    autoFocus
                 />
                 <TextField
-                margin="normal"
-                required
-                fullWidth
-                name="password"
-                label="Password"
-                type="password"
-                id="password"
-                autoComplete="current-password"
+                    margin="normal"
+                    required
+                    fullWidth
+                    name="password"
+                    label="Password"
+                    type="password"
+                    id="password"
+                    autoComplete="current-password"
                 />
                 <FormControlLabel
-                control={<Checkbox value="remember" color="primary" />}
-                label="Remember me"
+                    control={<Checkbox value="remember" color="primary" />}
+                    label="Remember me"
                 />
                 <Button
-                type="submit"
-                fullWidth
-                variant="contained"
-                sx={{ mt: 3, mb: 2 }}
+                    type="submit"
+                    fullWidth
+                    variant="contained"
+                    sx={{ mt: 3, mb: 2 }}
                 >
                 Sign In
                 </Button>
