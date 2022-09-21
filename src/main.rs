@@ -1,6 +1,7 @@
 mod handles;
 
 use axum::{Router, routing::{get, get_service}, middleware::from_fn};
+use log4rs_macros::info;
 use tower_http::services::{ServeFile, ServeDir};
 use crate::handles::{common_handles::{root, handle_static_error, mid_handler_404}, hello_service::HelloLayer};
 
@@ -8,6 +9,7 @@ use crate::handles::{common_handles::{root, handle_static_error, mid_handler_404
 async fn main() 
 {
     set_working_dir();
+    log4rs_macros::prepare_log();
 
     // build route
     let app = Router::new()
@@ -21,7 +23,7 @@ async fn main()
 
     // run it
     let addr = "127.0.0.1:3000".to_owned();
-    tracing::debug!("listening on {}", addr);
+    info!("listening on {}", addr);
     axum::Server::bind(&addr.parse().unwrap())
         .serve(app.into_make_service())
         .await

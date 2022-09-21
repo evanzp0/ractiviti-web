@@ -5,6 +5,8 @@ const gzip = require('gulp-gzip');
 const toml = require('toml');
 const fs = require('fs');
 const { src, dest, series, parallel } = require('gulp');
+const gulpCopy = require('gulp-copy');
+
 // const package = require('./package.json');
 
 var cargo_toml = toml.parse(fs.readFileSync('./Cargo.toml'));
@@ -15,6 +17,14 @@ function cleanWeb(cb) {
 
 function clean(cb) {
     del(['./target'], cb);
+}
+
+function copy_env_files() {
+    var sourceFiles = ['./log4rs_config.yaml'];
+    var outputPath = './target/debug';
+
+    return src(sourceFiles)
+        .pipe(gulpCopy(outputPath));
 }
 
 function npmBuild() {
@@ -42,6 +52,6 @@ exports.cleanWeb = cleanWeb;
 exports.clean = clean;
 exports.npmBuild = npmBuild;
 exports.cargoBuild = cargoBuild;
-exports.build = parallel(npmBuild, cargoBuild);
+exports.build = parallel(copy_env_files, npmBuild, cargoBuild);
 exports.package = package;
 exports.release = series(clean, parallel(npmBuild, cargoBuild), package);
