@@ -19,8 +19,8 @@ function clean(cb) {
     del(['./target'], cb);
 }
 
-function copy_env_files() {
-    var sourceFiles = ['./log4rs_config.yaml'];
+function copyEnvFiles() {
+    var sourceFiles = ['./log4rs_config.yaml', './config.yaml'];
     var outputPath = './target/debug';
 
     return src(sourceFiles)
@@ -50,8 +50,9 @@ function defaultTask(cb) {
 // exports.default = defaultTask
 exports.cleanWeb = cleanWeb;
 exports.clean = clean;
+exports.copyEnvFiles = copyEnvFiles;
 exports.npmBuild = npmBuild;
 exports.cargoBuild = cargoBuild;
-exports.build = parallel(copy_env_files, npmBuild, cargoBuild);
+exports.build = parallel(copyEnvFiles, npmBuild, cargoBuild);
 exports.package = package;
 exports.release = series(clean, parallel(npmBuild, cargoBuild), package);

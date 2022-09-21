@@ -10,6 +10,7 @@ async fn main()
 {
     set_working_dir();
     log4rs_macros::prepare_log();
+    let server_cfg = &ractiviti_core::common::global_cfg().server;
 
     // build route
     let app = Router::new()
@@ -22,7 +23,7 @@ async fn main()
         .layer(from_fn(mid_handler_404));
 
     // run it
-    let addr = "127.0.0.1:3000".to_owned();
+    let addr = server_cfg.addr();
     info!("listening on {}", addr);
     axum::Server::bind(&addr.parse().unwrap())
         .serve(app.into_make_service())
