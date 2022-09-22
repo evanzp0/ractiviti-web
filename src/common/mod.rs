@@ -1,4 +1,8 @@
-pub mod html_template;
-pub mod common_handles;
+use self::error::WebError;
 
-pub use html_template::*;
+pub mod template;
+pub mod handles;
+pub mod error;
+pub mod utils;
+
+pub type WebResult<T> = Result<T, WebError>;

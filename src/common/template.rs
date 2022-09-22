@@ -4,15 +4,15 @@ use ractiviti_core::error::{AppError, ErrorCode};
 use tokio::fs;
 use axum::response::Html;
 use ramhorns::{Content, Template};
-use color_eyre::Result;
 
+#[allow(dead_code)]
 pub enum HtmlTemplate<'a> {
     Source(&'a str),
     Path(&'a str)
 }
 
 impl<'a> HtmlTemplate<'a> {
-    pub async fn render<C: Content>(&self, content: &C) -> Result<Html<String>> {
+    pub async fn render<C: Content>(&self, content: &C) -> Result<Html<String>, AppError> {
         let mut source = String::new();
         match self {
             HtmlTemplate::Source(s) => {

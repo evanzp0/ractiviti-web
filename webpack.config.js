@@ -17,7 +17,7 @@ function htmlpack_option(modulename, in_filename, out_path) {
 module.exports = {
     entry: {
         home: './web/modules/views/home/index',
-        login: './web/modules/views/login/index',
+        sign_in: './web/modules/views/sign_in/index',
     },
     output: {
         path: path.resolve(__dirname, "target/debug/web"),
@@ -41,7 +41,7 @@ module.exports = {
     },
     plugins: [
         new HtmlWebpackPlugin(htmlpack_option('home', './web/modules/views/template/index.html')),
-        new HtmlWebpackPlugin(htmlpack_option('login', './web/modules/views/login/index.html')),
+        new HtmlWebpackPlugin(htmlpack_option('sign_in', './web/modules/views/sign_in/index.html')),
         new CopyPlugin({
             patterns: [
                 { from: "./web/public", to: "./" },
