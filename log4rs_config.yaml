@@ -8,8 +8,8 @@ root:
   appenders:
     - my_stdout
 loggers:
-  ractiviti_core:
-    level: info
+  ractiviti_web:
+    level: debug
     appenders:
       - my_stdout
     additive: false

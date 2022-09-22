@@ -9,6 +9,7 @@ pub struct HelloService<S> {
     inner: S,
 }
 
+#[allow(dead_code)]
 impl HelloLayer {
     pub fn new() -> Self {
         HelloLayer

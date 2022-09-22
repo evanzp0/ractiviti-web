@@ -1,13 +1,16 @@
 mod handles;
+mod common;
+mod api;
 
 use axum::{Router, routing::{get, post, get_service}, middleware::from_fn};
-use log4rs_macros::info;
 use tower_http::services::{ServeFile, ServeDir};
-use crate::handles::{
-    common_handles::{
-        root, handle_static_error, mid_handler_404, login
-    }, 
-    // hello_service::HelloLayer
+use crate::{
+        common::{
+            common_handles::{
+                root, handle_static_error, mid_handler_error, sign_up
+            }, 
+        }, 
+        api::login::login
 };
 
 #[tokio::main]
@@ -22,13 +25,14 @@ async fn main()
         .route("/", get(root))
         .route("/robots.txt", get_service(ServeFile::new("./web/robots.txt")).handle_error(handle_static_error))
         .nest("/assets", get_service(ServeDir::new("./web/assets")).handle_error(handle_static_error),)
+        .route("/sign_up", get(sign_up))
         .route("/service_api/login", post(login))
         // .layer(HelloLayer::new())
-        .layer(from_fn(mid_handler_404));
+        .layer(from_fn(mid_handler_error));
 
     // run it
     let addr = server_cfg.addr();
-    info!("listening on {}", addr);
+    println!("listening on {}", addr);
     axum::Server::bind(&addr.parse().unwrap())
         .serve(app.into_make_service())
         .await
@@ -44,5 +48,7 @@ pub fn set_working_dir()
         .expect("Can't get the working directory")
         .to_string_lossy()
         .into_owned();
+
     std::env::set_current_dir(work_dir).unwrap();
+    
 }

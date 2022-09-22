@@ -5,7 +5,7 @@ const gzip = require('gulp-gzip');
 const toml = require('toml');
 const fs = require('fs');
 const { src, dest, series, parallel } = require('gulp');
-const gulpCopy = require('gulp-copy');
+// const gulpCopy = require('gulp-copy');
 
 // const package = require('./package.json');
 
@@ -19,13 +19,13 @@ function clean(cb) {
     del(['./target'], cb);
 }
 
-function copyEnvFiles() {
-    var sourceFiles = ['./log4rs_config.yaml', './config.yaml'];
-    var outputPath = './target/debug';
+// function copyEnvFiles() {
+//     var sourceFiles = ['./log4rs_config.yaml', './config.yaml'];
+//     var outputPath = './target/debug';
 
-    return src(sourceFiles)
-        .pipe(gulpCopy(outputPath));
-}
+//     return src(sourceFiles)
+//         .pipe(gulpCopy(outputPath));
+// }
 
 function npmBuild() {
     return exec('npm run build');
@@ -37,6 +37,8 @@ function cargoBuild() {
 
 function package() {
     return src('target/debug/web/**')
+        .pipe(src('target/debug/log4rs_config.yaml'))
+        .pipe(src('target/debug/config.yaml'))
         .pipe(src('target/debug/' + cargo_toml.package.name))
         .pipe(tar(cargo_toml.package.name + '.tar'))
         .pipe(gzip())
@@ -48,11 +50,11 @@ function defaultTask(cb) {
 }
 
 // exports.default = defaultTask
+// exports.copyEnvFiles = copyEnvFiles;
 exports.cleanWeb = cleanWeb;
 exports.clean = clean;
-exports.copyEnvFiles = copyEnvFiles;
 exports.npmBuild = npmBuild;
 exports.cargoBuild = cargoBuild;
-exports.build = parallel(copyEnvFiles, npmBuild, cargoBuild);
+exports.build = parallel(npmBuild, cargoBuild);
 exports.package = package;
 exports.release = series(clean, parallel(npmBuild, cargoBuild), package);

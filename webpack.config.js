@@ -46,6 +46,9 @@ module.exports = {
             patterns: [
                 { from: "./web/public", to: "./" },
                 { from: "./web/assets", to: "./assets" },
+                {from: "./log4rs_config.yaml", to: "../"},
+                {from: "./config.yaml", to: "../"}
+
             ],
         }),
     ],
