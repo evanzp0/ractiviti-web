@@ -11,8 +11,8 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import ILoginData from './login_data';
-import LoginService from './login_service';
+import ILoginData from '../model/login_data';
+import LoginService from '../service/login_service';
 
 function Copyright(props: any) {
     return (
