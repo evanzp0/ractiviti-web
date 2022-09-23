@@ -44,7 +44,7 @@ module.exports = {
         new HtmlWebpackPlugin(htmlpack_option('sign_in', './web/modules/sign_in/index.html')),
         new CopyPlugin({
             patterns: [
-                { from: "./web/public", to: "./" },
+                { from: "./web/robots.txt", to: "./" },
                 { from: "./web/assets", to: "./assets" },
                 {from: "./log4rs_config.yaml", to: "../"},
                 {from: "./config.yaml", to: "../"}
