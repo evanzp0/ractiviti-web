@@ -15,7 +15,8 @@
     },
     "include": [
         "web/modules/**/*.ts",
-        "web/modules/**/*.tsx"
+        "web/modules/**/*.tsx", 
+        "web/common/**/*.tsx"
     ],
     "exclude": [
         "node_modules"

@@ -1,5 +1,5 @@
-import http from './ http-common';
-import ILoginData from '../models/login_data'
+import http from '../../common/service/ http-common';
+import ILoginData from './login_data'
 
 class LoginService {
     login(data: ILoginData) {
