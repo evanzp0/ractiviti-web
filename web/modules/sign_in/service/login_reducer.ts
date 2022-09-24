@@ -1,0 +1,53 @@
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+
+import ILoginData from "../model/login_data";
+import { AppThunkDispatch } from '../model/login_store';
+import LoginService from '../service/login_service';
+
+let initData: ILoginData = {
+    user_name: '',
+    password: ''
+};
+
+export const loginSlice = createSlice({
+    name: "login",
+    initialState: initData,
+    reducers: {
+        logined: () => {
+            window.location.href = "/home";
+        },
+        reset: (state, action: PayloadAction<ILoginData & { cb: () => void } >) => {
+            state.user_name = action.payload.user_name;
+            state.password = action.payload.password;
+
+            action.payload.cb();
+        },
+    }
+});
+
+export const login = (loginData: ILoginData) => async (dispatch: AppThunkDispatch) => {
+    LoginService.login(loginData)
+        .then((response: any) => {
+            console.log(response.data.is_pass);
+            console.log(response.data, response.data.user_name, response.data.is_pass);
+
+            if (response.data.is_pass) {
+                dispatch(logined())
+            } else {
+                alert("用户名或密码错误")
+            }
+        })
+        .catch((e:Error) => {
+            console.log(e);
+        })
+}
+
+// export function login(loginData: ILoginData) {
+//     return async (dispatch: ThunkDispatch<RootState, unknown, AnyAction>) => {
+//         console.log(loginData.user_name, loginData.password);
+//         dispatch(logined())
+//     }
+// }
+
+export const {reset, logined} = loginSlice.actions;
+export default loginSlice.reducer;

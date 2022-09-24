@@ -6,7 +6,7 @@ use api::login::login;
 use axum::{Router, routing::{get, post, get_service}, middleware::from_fn};
 use handles::root;
 use tower_http::services::{ServeFile, ServeDir};
-use crate::{common::handles::{handle_static_error, mid_handler_error}, handles::sign_in};
+use crate::{common::handles::{handle_static_error, mid_handler_error}, handles::{sign_in, home}};
 
 #[tokio::main]
 async fn main() 
@@ -21,6 +21,7 @@ async fn main()
         .route("/robots.txt", get_service(ServeFile::new("./web/robots.txt")).handle_error(handle_static_error))
         .nest("/assets", get_service(ServeDir::new("./web/assets")).handle_error(handle_static_error),)
         .route("/sign_up", get(sign_in))
+        .route("/home", get(home))
         .route("/service_api/login", post(login))
         // .layer(HelloLayer::new())
         .layer(from_fn(mid_handler_error));

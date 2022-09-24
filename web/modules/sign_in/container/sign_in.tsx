@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useState } from 'react';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -11,8 +11,10 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+
 import ILoginData from '../model/login_data';
-import LoginService from '../service/login_service';
+import {login, reset} from '../service/login_reducer';
+import {useAppDispatch, useAppSelector} from '../model/hook'
 
 function Copyright(props: any) {
     return (
@@ -30,27 +32,39 @@ function Copyright(props: any) {
 
 const theme = createTheme();
 
-// type State = ILoginData & {
-//     submitted: boolean
-// };
+// export const SignIn: React.FC<ILoginData> = ({user_name, password}) => {...}
 
 export default function SignIn() {
+
+    const {user_name, password} = useAppSelector( (state) => state.login);
+    const [s_user_name, setUserName] = useState(user_name);
+    const [s_password, setPassword] = useState(password);
+    const dispatch = useAppDispatch();
+
     const handleLogin = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         const data = new FormData(event.currentTarget);
+
         let loginData: ILoginData = {
             user_name: data.get('user_name')!.toString(),
-            password: data.get('password')!.toString(),
+            password: data.get('password')!.toString()
         };
-        console.log(loginData);
 
-        LoginService.login(loginData)
-            .then((response: any) => {
-                console.log(response.data);
-            })
-            .catch((e:Error) => {
-                console.log(e);
-            })
+        dispatch(login(loginData))
+    };
+
+    const handleReset = (event: React.MouseEvent<HTMLElement>) => {
+        event.preventDefault();
+
+        let resetData: ILoginData & {cb: () => void} = {
+            user_name: '',
+            password: '',
+            cb: () => {
+                setUserName('');
+                setPassword('');
+            }
+        };
+        dispatch(reset(resetData))
     };
 
     return (
@@ -69,28 +83,31 @@ export default function SignIn() {
                         <LockOutlinedIcon />
                     </Avatar>
                     <Typography component="h1" variant="h5">
-                        登入
+                        Ractiviti 工作流管理系统
                     </Typography>
                     <Box component="form" onSubmit={handleLogin} noValidate sx={{ mt: 1 }}>
                         <TextField
                             margin="normal"
                             required
                             fullWidth
-                            id="email"
-                            label="Email Address"
-                            name="email"
-                            autoComplete="email"
+                            id="user_name"
+                            label="用户名"
+                            name="user_name"
+                            value={s_user_name}
                             autoFocus
+                            onChange={(e) => setUserName(e.target.value)}
                         />
                         <TextField
                             margin="normal"
                             required
                             fullWidth
                             name="password"
-                            label="Password"
+                            label="密码"
                             type="password"
                             id="password"
+                            value={s_password}
                             autoComplete="current-password"
+                            onChange={(e) => setPassword(e.target.value)}
                         />
                         <FormControlLabel
                             control={<Checkbox value="remember" color="primary" />}
@@ -104,6 +121,15 @@ export default function SignIn() {
                         >
                             登入
                         </Button>
+                        <Button
+                            type="button"
+                            fullWidth
+                            variant="contained"
+                            sx={{ mt: 3, mb: 2 }}
+                            onClick={handleReset}
+                        >
+                            重置
+                        </Button>
                     </Box>
                 </Box>
                 <Copyright sx={{ mt: 8, mb: 4 }} />
@@ -111,3 +137,11 @@ export default function SignIn() {
         </ThemeProvider>
     );
 }
+
+// const mapStateToProps = (state: RootState) => {
+//     return {
+//         user_name: state.login.user_name
+//     };
+// };
+
+// export default connect(mapStateToProps)(SignIn);

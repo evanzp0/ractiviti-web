@@ -19,6 +19,7 @@ module.exports = {
         home: './web/modules/home/index',
         sign_in: './web/modules/sign_in/index',
     },
+    devtool: 'inline-source-map',
     output: {
         path: path.resolve(__dirname, "target/debug/web"),
         filename: 'assets/modules/[name].[contenthash:8].js',
