@@ -40,12 +40,13 @@ export const login = (loginData: ILoginData) => async (dispatch: AppThunkDispatc
                     localStorage.removeItem("loginData");
                 }
 
-                dispatch(logined())
+                dispatch(logined());
             } else {
-                alert("用户名或密码错误")
+                alert(response.data.error);
             }
         })
         .catch((e:Error) => {
+            alert(e);
             console.log(e);
         })
 }
