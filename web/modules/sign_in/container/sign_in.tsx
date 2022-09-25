@@ -32,25 +32,47 @@ function Copyright(props: any) {
 
 const theme = createTheme();
 
+function loadLoginData() : ILoginData | null {
+    
+    let data = localStorage.getItem("loginData");
+    if (data) {
+        return JSON.parse(data);
+    }
+    
+    return null;
+}
+
+let loginData = loadLoginData();
+
 // export const SignIn: React.FC<ILoginData> = ({user_name, password}) => {...}
 
 export default function SignIn() {
-
-    const {user_name, password} = useAppSelector( (state) => state.login);
-    const [s_user_name, setUserName] = useState(user_name);
-    const [s_password, setPassword] = useState(password);
+    // const {user_name, password, remember} = useAppSelector( (state) => state.login);
+    const [s_user_name, setUserName] = useState(loginData?.user_name);
+    const [s_password, setPassword] = useState(loginData?.password);
+    const [s_remember, setRemember] = useState(loginData?.remember);
     const dispatch = useAppDispatch();
+
+    // const handleRemeber = (event: React.ChangeEvent<HTMLInputElement>, checked: boolean) => {
+    //     setRemember(!s_remember);
+    // }
 
     const handleLogin = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         const data = new FormData(event.currentTarget);
 
         let loginData: ILoginData = {
-            user_name: data.get('user_name')!.toString(),
-            password: data.get('password')!.toString()
+            user_name: data.get('user_name')!.toString().trim(),
+            password: data.get('password')!.toString().trim(),
+            remember: data.get('remember')?.toString() ? data.get('remember')!.toString() == "true" : false,
         };
 
-        dispatch(login(loginData))
+        if (loginData.user_name && loginData.password) {
+            dispatch(login(loginData));
+        } else {
+            // error={formError && firstName.length === 0}
+            alert("用户名和密码不可为空");
+        }
     };
 
     const handleReset = (event: React.MouseEvent<HTMLElement>) => {
@@ -59,9 +81,11 @@ export default function SignIn() {
         let resetData: ILoginData & {cb: () => void} = {
             user_name: '',
             password: '',
+            remember: false,
             cb: () => {
                 setUserName('');
                 setPassword('');
+                setRemember(false);
             }
         };
         dispatch(reset(resetData))
@@ -110,8 +134,10 @@ export default function SignIn() {
                             onChange={(e) => setPassword(e.target.value)}
                         />
                         <FormControlLabel
-                            control={<Checkbox value="remember" color="primary" />}
-                            label="Remember me"
+                            control={
+                                <Checkbox name="remember" value="true" color="primary" onChange={() => setRemember(!s_remember)} checked={s_remember} />
+                            }
+                            label="记住用户名和密码"
                         />
                         <Button
                             type="submit"

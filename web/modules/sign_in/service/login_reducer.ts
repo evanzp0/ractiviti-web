@@ -6,7 +6,8 @@ import LoginService from '../service/login_service';
 
 let initData: ILoginData = {
     user_name: '',
-    password: ''
+    password: '',
+    remember: false,
 };
 
 export const loginSlice = createSlice({
@@ -19,19 +20,26 @@ export const loginSlice = createSlice({
         reset: (state, action: PayloadAction<ILoginData & { cb: () => void } >) => {
             state.user_name = action.payload.user_name;
             state.password = action.payload.password;
-
+            state.remember = action.payload.remember;
+            
             action.payload.cb();
         },
     }
 });
 
 export const login = (loginData: ILoginData) => async (dispatch: AppThunkDispatch) => {
+    let remember = loginData.remember;
+
     LoginService.login(loginData)
         .then((response: any) => {
-            console.log(response.data.is_pass);
-            console.log(response.data, response.data.user_name, response.data.is_pass);
-
             if (response.data.is_pass) {
+
+                if (remember) {
+                    localStorage.setItem("loginData", JSON.stringify(loginData));
+                } else {
+                    localStorage.removeItem("loginData");
+                }
+
                 dispatch(logined())
             } else {
                 alert("用户名或密码错误")
