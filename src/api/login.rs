@@ -30,9 +30,18 @@ pub async fn login(Json(payload): Json<LoginData>) -> WebResult<impl IntoRespons
                     is_pass: false
                 };
 
-                Ok((StatusCode::OK, Json(login_result)).into_response())
+                // Err(
+                //     AppError::new(
+                //         ErrorCode::NotAuthorized, 
+                //         Some("用户名或密码错误"),
+                //         &format!("{} : {} , {}", file!(), line!(), error.to_string()),
+                //         None
+                //     )
+                // )?
+                
+                Ok((StatusCode::UNAUTHORIZED, Json(login_result)).into_response())
             } else {
-                todo!()
+                Err(error)?
             }
         },
     }

@@ -45,8 +45,14 @@ export const login = (loginData: ILoginData) => async (dispatch: AppThunkDispatc
                 alert(response.data.error);
             }
         })
-        .catch((e:Error) => {
-            alert(e);
+        .catch((e) => {
+            if (e.response.data && e.response.data.error) {
+                alert(e.response.data.error);
+            } else if (e.response.data) {
+                alert(e.response.data);
+            } else {
+                alert(e);
+            }
             console.log(e);
         })
 }

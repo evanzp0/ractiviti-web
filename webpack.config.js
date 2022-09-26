@@ -49,7 +49,6 @@ module.exports = {
                 { from: "./web/assets", to: "./assets" },
                 {from: "./log4rs_config.yaml", to: "../"},
                 {from: "./config.yaml", to: "../"}
-
             ],
         }),
     ],
@@ -71,4 +70,9 @@ module.exports = {
         compress: true,
         port: 9000,
     },
+    // watchOptions: {
+    //     aggregateTimeout: 10,
+    //     poll: 50, // Check for changes every second
+    //     ignored: ['**/node_modules'],
+    // },
 };
