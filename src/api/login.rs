@@ -39,7 +39,7 @@ pub async fn login(Json(payload): Json<LoginData>) -> WebResult<impl IntoRespons
                 //     )
                 // )?
                 
-                Ok((StatusCode::UNAUTHORIZED, Json(login_result)).into_response())
+                Ok((StatusCode::OK, Json(login_result)).into_response())
             } else {
                 Err(error)?
             }
