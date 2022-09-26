@@ -60,7 +60,11 @@ impl IntoResponse for WebError {
                 _ => {
                     let trace_no = gen_random_str(16);
                     error!("trace_no: {}, {:?}", trace_no, ae.to_string());
-                    err_with_trace_no(StatusCode::INTERNAL_SERVER_ERROR, Some(&trace_no), Some(ErrBody::Html(&ae.msg)))
+                    let mut error_code = StatusCode::INTERNAL_SERVER_ERROR;
+                    if ae.code == ErrorCode::NotAuthorized {
+                        error_code = StatusCode::UNAUTHORIZED;
+                    }
+                    err_with_trace_no(error_code, Some(&trace_no), Some(ErrBody::Html(&ae.msg)))
                 },
             }
         };
