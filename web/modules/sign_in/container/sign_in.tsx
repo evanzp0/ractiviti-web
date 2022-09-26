@@ -15,6 +15,7 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import ILoginData from '../model/login_data';
 import {login, reset} from '../service/login_reducer';
 import {useAppDispatch, useAppSelector} from '../model/hook'
+import Grid from '@mui/material/Unstable_Grid2/Grid2';
 
 function Copyright(props: any) {
     return (
@@ -139,23 +140,29 @@ export default function SignIn() {
                             }
                             label="记住用户名和密码"
                         />
-                        <Button
-                            type="submit"
-                            fullWidth
-                            variant="contained"
-                            sx={{ mt: 3, mb: 2 }}
-                        >
-                            登入
-                        </Button>
-                        <Button
-                            type="button"
-                            fullWidth
-                            variant="contained"
-                            sx={{ mt: 3, mb: 2 }}
-                            onClick={handleReset}
-                        >
-                            重置
-                        </Button>
+                        <Grid container spacing={2} >
+                            <Grid xs={9}>
+                                <Button
+                                    type="submit"
+                                    fullWidth
+                                    variant="contained"
+                                    sx={{ mt: 3, mb: 2 }}
+                                >
+                                    登入
+                                </Button>
+                            </Grid>
+                            <Grid xs={3}>
+                                <Button
+                                    type="button"
+                                    fullWidth
+                                    variant="contained"
+                                    sx={{ mt: 3, mb: 2, backgroundColor:"gray" }}
+                                    onClick={handleReset}
+                                >
+                                    重置
+                                </Button>
+                            </Grid>
+                        </Grid>
                     </Box>
                 </Box>
                 <Copyright sx={{ mt: 8, mb: 4 }} />
