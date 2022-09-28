@@ -69,6 +69,7 @@ module.exports = {
         },
         compress: true,
         port: 9000,
+        hot: false,
     },
     // watchOptions: {
     //     aggregateTimeout: 10,
