@@ -1,7 +1,7 @@
 use ractiviti_core::common::db;
 use color_eyre::Result;
 
-use crate::{dao::ApfSysUserDao, model::ApfSysUser, md5};
+use crate::{dao::ApfSysUserDao, model::ApfSysUser, common::utils::md5};
 
 
 pub struct SysUserService;

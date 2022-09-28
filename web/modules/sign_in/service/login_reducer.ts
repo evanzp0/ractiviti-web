@@ -15,7 +15,7 @@ export const loginSlice = createSlice({
     initialState: initData,
     reducers: {
         logined: () => {
-            window.location.href = "/home";
+            window.location.href = "/dashboard";
         },
         reset: (state, action: PayloadAction<ILoginData & { cb: () => void } >) => {
             state.user_name = action.payload.user_name;

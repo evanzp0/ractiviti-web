@@ -68,7 +68,25 @@ let user_menus = [
     },
 ];
 
-let initModule = '系统看板';
+function get_menu_name_by_url() {
+    let path = window.location.pathname;
+
+    for (let menu of flow_menus) {
+        if (menu.url == path) {
+            return menu.name;
+        }
+    }
+
+    for (let menu of user_menus) {
+        if (menu.url == path) {
+            return menu.name;
+        }
+    }
+
+    return "";
+}
+
+let initModule = get_menu_name_by_url();
 
 export default function ResponsiveDrawer(props: Props) {
     const { window } = props;
