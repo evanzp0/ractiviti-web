@@ -98,3 +98,8 @@ impl Display for WrappedError {
 }
 
 impl Error for WrappedError {}
+
+#[derive(Serialize)]
+pub struct JsonErrorMsg<'a> {
+    pub error: &'a str,
+}

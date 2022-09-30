@@ -8,6 +8,8 @@ use axum_sessions::SessionHandle;
 // use axum::body::Body;
 // use axum::body::HttpBody;
 
+use crate::common::error::JsonErrorMsg;
+
 use super::USER_ID_KEY;
 
 #[derive(Clone)]
@@ -45,7 +47,7 @@ where
                 let request = request;
                 let content_type = request.headers().get("Content-Type");
                 let is_json_req = if let Some(value) = content_type {
-                    value.to_str().unwrap_or("").to_lowercase() == "application/javascript"
+                    value.to_str().unwrap_or("").to_lowercase() == "application/json"
                 } else {
                     false
                 };
@@ -74,7 +76,7 @@ where
                     
                     let msg = "当前用户尚未登录，请先登录";
                     if is_json_req {
-                        Ok((StatusCode::UNAUTHORIZED, Json(msg)).into_response())
+                        Ok((StatusCode::UNAUTHORIZED, Json(JsonErrorMsg{error: msg})).into_response())
                     } else {
                         Ok((StatusCode::UNAUTHORIZED, msg).into_response())
                     }
