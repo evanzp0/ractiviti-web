@@ -13,7 +13,7 @@ use axum_sessions::{async_session::MemoryStore, extractors::WritableSession};
 use axum_sessions::{SessionLayer, SessionHandle};
 use handles::USER_ID_KEY;
 use hyper::{StatusCode, Request, Body};
-use crate::handles::{MemorySessionFacade, MemorySessionFacadeLayer};
+use crate::handles::MemorySessionFacadeLayer;
 use crate::{common::{handles::mid_handler_error, utils::{set_working_dir, gen_random_str}}, route::{page_route, api_route, client_route}};
 
 #[tokio::main]

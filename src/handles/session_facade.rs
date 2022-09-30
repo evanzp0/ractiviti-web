@@ -125,7 +125,7 @@ impl SessionFacade for MemorySessionFacade {
         let session = self.session_handle.read().await;
         
         match session.get::<String>(USER_ID_KEY) {
-            Some(user_id) => {
+            Some(_) => {
                 true
             },
             None => false,
