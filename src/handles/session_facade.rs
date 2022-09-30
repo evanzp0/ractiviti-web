@@ -1,23 +1,60 @@
-use std::task::{Poll, Context};
+use std::{task::{Poll, Context}};
 
+use async_trait::async_trait;
 use futures::future::BoxFuture;
 use hyper::Request;
 use tower::{Layer, Service};
-use axum::{response::Response, body::BoxBody};
+use axum::{response::Response, body::BoxBody, extract::{FromRequest, RequestParts}, Extension};
+use axum_sessions::SessionHandle;
 
+pub const USER_ID_KEY: &str = "user_id";
+pub const USER_NAME_KEY: &str = "user_name";
+
+#[async_trait]
 pub trait SessionFacade {
-    fn get_session_id(&self) -> String;
-    fn get_user_name(&self) -> String;
-    fn set_user_name(&mut self);
-    fn set_session_id(&mut self);
+    async fn get_user_id(&self) -> Option<String>;
+    async fn set_user_id(&mut self, user_id: String);
+    async fn get_user_name(&self) -> Option<String>;
+    async fn set_user_name(&mut self, user_id: String);
+    async fn is_login(&self) -> bool;
 }
 
 #[derive(Clone)]
-pub struct MemorySessionFacade<I> {
+pub struct MemorySessionFacade {
+    session_handle: SessionHandle
+}
+
+impl MemorySessionFacade {
+    pub fn new(session_handle: SessionHandle) -> Self {
+        MemorySessionFacade {
+            session_handle
+        }
+    }
+}
+
+#[async_trait]
+impl<Body> FromRequest<Body> for MemorySessionFacade 
+where
+    Body: Send,
+{
+    type Rejection = std::convert::Infallible;
+
+    async fn from_request(request: &mut RequestParts<Body>) -> Result<Self, Self::Rejection> {
+
+        let Extension(sf): Extension<MemorySessionFacade> = Extension::from_request(request)
+            .await
+            .expect("Auth extension missing. Is the auth layer installed?");
+
+        Ok(sf)
+    }
+}
+
+#[derive(Clone)]
+pub struct MemorySessionFacadeService<I> {
     pub inner: I
 }
 
-impl<I> MemorySessionFacade<I> {
+impl<I> MemorySessionFacadeService<I> {
     pub fn new(inner: I) -> Self {
         Self {
             inner
@@ -25,7 +62,7 @@ impl<I> MemorySessionFacade<I> {
     }
 }
 
-impl<Inner, ReqBody> Service<Request<ReqBody>> for MemorySessionFacade<Inner> 
+impl<Inner, ReqBody> Service<Request<ReqBody>> for MemorySessionFacadeService<Inner> 
 where
     Inner: Service<Request<ReqBody>, Response = Response> + Clone + Send + 'static,
     ReqBody: Send + 'static,
@@ -42,48 +79,75 @@ where
 
     fn call(&mut self, request: Request<ReqBody>) -> Self::Future {
         let mut inner =  self.inner.clone();
-        let rst = Box::pin(async move {
-            inner.call(request).await
-        });
+        let rst = Box::pin(
+            async move {
+                let mut request = request;
+                let session_handle = request.extensions().get::<SessionHandle>().expect("Not found SessionHandle");
+                {
+                    let sf = MemorySessionFacade::new(session_handle.clone());
+                    request.extensions_mut().insert(sf.clone());
+                }
 
-        println!("call MemorySessionFacade");
+                inner.call(request).await
+            }
+        );
 
         rst
     }
 }
 
-impl<I> SessionFacade for MemorySessionFacade<I> {
-    fn get_session_id(&self) -> String {
-        "id".to_owned()
+unsafe impl Send for MemorySessionFacade {}
+unsafe impl Sync for MemorySessionFacade {}
+
+#[async_trait]
+impl SessionFacade for MemorySessionFacade {
+    async fn get_user_id(&self) -> Option<String> {
+        let session = self.session_handle.read().await;
+        session.get::<String>(USER_ID_KEY)
     }
 
-    fn get_user_name(&self) -> String {
-        "user_name".to_owned()
+    async fn set_user_id(&mut self, user_id: String) {
+        let mut session = self.session_handle.write().await;
+        session.insert(USER_ID_KEY, user_id).expect("Could not store user_id");
     }
 
-    fn set_user_name(&mut self) {
-        println!("set_user_name");
+    async fn get_user_name(&self) -> Option<String> {
+        let session = self.session_handle.read().await;
+        session.get::<String>(USER_NAME_KEY)
     }
 
-    fn set_session_id(&mut self)  {
-        println!("set_session_id");
+    async fn set_user_name(&mut self, user_name: String) {
+        let mut session = self.session_handle.write().await;
+        session.insert(USER_ID_KEY, user_name).expect("Could not store user_name");
     }
+    
+    async fn is_login(&self) -> bool {
+        let session = self.session_handle.read().await;
+        
+        match session.get::<String>(USER_ID_KEY) {
+            Some(user_id) => {
+                true
+            },
+            None => false,
+        }
+    }
+
 }
 
-pub struct SessionFacadeLayer;
+pub struct MemorySessionFacadeLayer;
 
-impl SessionFacadeLayer
+impl MemorySessionFacadeLayer
 {
     pub fn new() -> Self {
         Self
     }
 }
 
-impl<Inner> Layer<Inner> for SessionFacadeLayer 
+impl<Inner> Layer<Inner> for MemorySessionFacadeLayer 
 {
-    type Service = MemorySessionFacade<Inner>;
+    type Service = MemorySessionFacadeService<Inner>;
 
     fn layer(&self, inner: Inner) -> Self::Service {
-        MemorySessionFacade::new(inner)
+        MemorySessionFacadeService::new(inner)
     }
 }

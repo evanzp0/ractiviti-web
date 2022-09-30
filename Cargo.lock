@@ -1448,6 +1448,7 @@ dependencies = [
 name = "ractiviti-web"
 version = "0.1.0"
 dependencies = [
+ "async-trait",
  "axum",
  "axum-sessions",
  "chrono",

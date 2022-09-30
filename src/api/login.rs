@@ -3,9 +3,12 @@ use hyper::StatusCode;
 use ractiviti_core::error::{AppError, ErrorCode};
 use serde::{Deserialize, Serialize};
 
-use crate::{service::SysUserService, common::WebResult};
+use crate::{service::SysUserService, common::WebResult, handles::{SessionFacade, MemorySessionFacade}};
 
-pub async fn login(Json(payload): Json<LoginData>) -> WebResult<impl IntoResponse> {
+pub async fn login(Json(payload): Json<LoginData>, mut session_facade: MemorySessionFacade) -> WebResult<impl IntoResponse> {
+    let is_login = session_facade.is_login().await;
+    println!("is_login in login: {}", is_login);
+
     let sysuser_service = SysUserService::new();
     let verify_rst = sysuser_service.verify_sysuser(&payload.user_name, &payload.password).await;
 
@@ -16,7 +19,8 @@ pub async fn login(Json(payload): Json<LoginData>) -> WebResult<impl IntoRespons
                 error: None,
                 is_pass: true
             };
-    
+            session_facade.set_user_id(sys_user.id.clone()).await;
+
             Ok(Json(login_result).into_response())
         },
         Err(error) => {
