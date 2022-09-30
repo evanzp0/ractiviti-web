@@ -3,9 +3,9 @@ use hyper::StatusCode;
 use ractiviti_core::error::{AppError, ErrorCode};
 use serde::{Deserialize, Serialize};
 
-use crate::{service::SysUserService, common::WebResult, handles::{SessionFacade, MemorySessionFacade}};
+use crate::{service::SysUserService, common::WebResult, handles::{SessionFacadeInerface, SessionFacade}};
 
-pub async fn login(Json(payload): Json<LoginData>, mut session_facade: MemorySessionFacade) -> WebResult<impl IntoResponse> {
+pub async fn login(Json(payload): Json<LoginData>, mut session_facade: SessionFacade) -> WebResult<impl IntoResponse> {
     let is_login = session_facade.is_login().await;
     println!("is_login in login: {}", is_login);
 

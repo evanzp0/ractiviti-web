@@ -9,9 +9,10 @@ use axum_sessions::SessionHandle;
 
 pub const USER_ID_KEY: &str = "user_id";
 pub const USER_NAME_KEY: &str = "user_name";
+pub type SessionFacade = MemorySessionFacade;
 
 #[async_trait]
-pub trait SessionFacade {
+pub trait SessionFacadeInerface {
     async fn get_user_id(&self) -> Option<String>;
     async fn set_user_id(&mut self, user_id: String);
     async fn get_user_name(&self) -> Option<String>;
@@ -100,7 +101,7 @@ unsafe impl Send for MemorySessionFacade {}
 unsafe impl Sync for MemorySessionFacade {}
 
 #[async_trait]
-impl SessionFacade for MemorySessionFacade {
+impl SessionFacadeInerface for MemorySessionFacade {
     async fn get_user_id(&self) -> Option<String> {
         let session = self.session_handle.read().await;
         session.get::<String>(USER_ID_KEY)
