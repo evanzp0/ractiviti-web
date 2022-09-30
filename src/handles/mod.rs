@@ -1,4 +1,4 @@
-pub mod hello_service;
+pub mod hello_layer;
 pub mod root;
 pub mod sign_in;
 pub mod home;
