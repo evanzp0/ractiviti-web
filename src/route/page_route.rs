@@ -1,7 +1,7 @@
 use axum::{Router, routing::{get, get_service}};
 use tower_http::services::{ServeFile, ServeDir};
 
-use crate::{handles::{root, sign_in}, common::handles::handle_static_error};
+use crate::handles::{root, sign_in, handle_static_error};
 
 pub fn page_route() -> Router {
     let routes = Router::new()

@@ -14,7 +14,7 @@ pub struct TraceNo {
     pub value: String
 }
 
-pub async fn mid_handler_error
+pub async fn handler_error_layer
 <B>(req: Request<B>, next: Next<B>) -> impl IntoResponse
 where
     B: std::fmt::Debug,

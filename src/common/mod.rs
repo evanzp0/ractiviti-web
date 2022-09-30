@@ -1,7 +1,6 @@
 use self::error::WebError;
 
 pub mod template;
-pub mod handles;
 pub mod error;
 pub mod utils;
 

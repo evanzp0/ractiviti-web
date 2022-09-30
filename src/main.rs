@@ -13,8 +13,8 @@ use axum_sessions::{async_session::MemoryStore, extractors::WritableSession};
 use axum_sessions::{SessionLayer, SessionHandle};
 use handles::USER_ID_KEY;
 use hyper::{StatusCode, Request, Body};
-use crate::handles::MemorySessionFacadeLayer;
-use crate::{common::{handles::mid_handler_error, utils::{set_working_dir, gen_random_str}}, route::{page_route, api_route, client_route}};
+use crate::handles::{MemorySessionFacadeLayer, handler_error_layer};
+use crate::{common::utils::{set_working_dir, gen_random_str}, route::{page_route, api_route, client_route}};
 
 #[tokio::main]
 async fn main() 
@@ -37,7 +37,7 @@ async fn main()
         .route("/session_write", get(session_write))
         .route("/session_read", get(session_read))
         .layer(MemorySessionFacadeLayer::new())
-        .layer(from_fn(mid_handler_error))
+        .layer(from_fn(handler_error_layer))
         .layer(session_layer);
         // .layer(HelloLayer::new())
         
