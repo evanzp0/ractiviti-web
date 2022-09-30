@@ -36,9 +36,9 @@ async fn main()
         .merge(client_route())
         .route("/session_write", get(session_write))
         .route("/session_read", get(session_read))
-        .layer(session_layer)
         .layer(MemorySessionFacadeLayer::new())
-        .layer(from_fn(mid_handler_error));
+        .layer(from_fn(mid_handler_error))
+        .layer(session_layer);
         // .layer(HelloLayer::new())
         
     // run it
