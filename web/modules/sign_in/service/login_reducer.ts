@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 import ILoginData from "../model/login_data";
-import { AppThunkDispatch } from '../model/login_store';
+import { AppThunkDispatch } from './login_store';
 import LoginService from '../service/login_service';
 
 let initData: ILoginData = {

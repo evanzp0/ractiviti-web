@@ -1,6 +1,6 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom/client";
-import {store} from './model/login_store';
+import {store} from './service/login_store';
 import { Provider } from 'react-redux'
 import App from "./container/sign_in";
 

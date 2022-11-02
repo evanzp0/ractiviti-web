@@ -15,7 +15,7 @@ import Grid from '@mui/material/Unstable_Grid2/Grid2';
 
 import ILoginData from '../model/login_data';
 import {login, reset} from '../service/login_reducer';
-import {useAppDispatch} from '../model/hook'
+import {useAppDispatch} from '../service/hook'
 
 function Copyright(props: any) {
     return (

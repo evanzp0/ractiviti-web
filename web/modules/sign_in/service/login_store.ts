@@ -1,5 +1,5 @@
 import { AnyAction, configureStore } from '@reduxjs/toolkit';
-import loginReducer from '../service/login_reducer';
+import loginReducer from './login_reducer';
 import thunkMiddleware, { ThunkDispatch } from 'redux-thunk'
 
 export const store = configureStore({
