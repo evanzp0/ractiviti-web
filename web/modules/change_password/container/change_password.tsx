@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import Grid from '@mui/material/Unstable_Grid2/Grid2';
-import { Box, Button, TextField } from '@mui/material';
+import { Box, Button, FormControl, InputLabel, TextField } from '@mui/material';
 import IPasswordData from '../model/password_data';
 import { object, string, TypeOf } from 'zod';
 import { SubmitHandler, useForm } from 'react-hook-form';
@@ -63,40 +63,49 @@ export default function ChangePassword() {
 
     return (
         <ThemeProvider theme={theme}>
-            <Box component="form" onSubmit={handleSubmit(handleChangePassword)} noValidate sx={{maxWidth: '30rem' }} >
-                <TextField
-                    margin="normal"
-                    required
-                    fullWidth
-                    label="当前密码"
-                    type="password"
-                    id="password"
-                    error={!!errors['password']}
-                    helperText={errors['password'] ? errors['password'].message : ''}
-                    {...register('password')}
-                />
-                <TextField
-                    margin="normal"
-                    required
-                    fullWidth
-                    label="新密码"
-                    type="password"
-                    id="new_password"
-                    error={!!errors['new_password']}
-                    helperText={errors['new_password'] ? errors['new_password'].message : ''}
-                    {...register('new_password')}
-                />
-                <TextField
-                    margin="normal"
-                    required
-                    fullWidth
-                    label="再次输入"
-                    type="password"
-                    id="re_password"
-                    error={!!errors['re_password']}
-                    helperText={errors['re_password'] ? errors['re_password'].message : ''}
-                    {...register('re_password')}
-                />
+            <Box component="form" onSubmit={handleSubmit(handleChangePassword)} noValidate sx={{maxWidth: '20rem' }} >
+                <FormControl variant="standard" fullWidth sx={{ mt: 1 }}>
+                    <InputLabel shrink htmlFor="password">当前密码*</InputLabel>
+                    <TextField
+                        margin="normal"
+                        required
+                        fullWidth
+                        type="password"
+                        id="password"
+                        size='small'
+                        error={!!errors['password']}
+                        helperText={errors['password'] ? errors['password'].message : ''}
+                        {...register('password')}
+                    />
+                </FormControl>
+                <FormControl variant="standard" fullWidth sx={{ mt: 1 }}>
+                    <InputLabel shrink htmlFor="new_password">新密码*</InputLabel>
+                    <TextField
+                        margin="normal"
+                        required
+                        fullWidth
+                        type="password"
+                        id="new_password"
+                        size='small'
+                        error={!!errors['new_password']}
+                        helperText={errors['new_password'] ? errors['new_password'].message : ''}
+                        {...register('new_password')}
+                    />
+                </FormControl>
+                <FormControl variant="standard" fullWidth sx={{ mt: 1 }}>
+                    <InputLabel shrink htmlFor="password">再次输入*</InputLabel>
+                    <TextField
+                        margin="normal"
+                        required
+                        fullWidth
+                        type="password"
+                        id="re_password"
+                        size='small'
+                        error={!!errors['re_password']}
+                        helperText={errors['re_password'] ? errors['re_password'].message : ''}
+                        {...register('re_password')}
+                    />
+                </FormControl>
                 <Grid container spacing={2} >
                     <Grid xs={6}>
                         <LoadingButton
@@ -120,8 +129,7 @@ export default function ChangePassword() {
                             重置
                         </Button>
                     </Grid>
-            </Grid>
-
+                </Grid>
             </Box>
         </ThemeProvider>
     )
