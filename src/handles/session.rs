@@ -1,3 +1,4 @@
+#![allow(unused_variables, dead_code)]
 // Much of this code is lifted directly from
 // `tide::sessions::middleware::SessionMiddleware`. See: https://github.com/http-rs/tide/blob/20fe435a9544c10f64245e883847fc3cd1d50538/src/sessions/middleware.rs
 

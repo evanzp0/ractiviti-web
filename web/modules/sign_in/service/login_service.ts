@@ -1,4 +1,4 @@
-import http from '../../../common/service/ http-common';
+import http from '../../../common/service/http-common';
 import ILoginData from '../model/login_data'
 
 class LoginService {
