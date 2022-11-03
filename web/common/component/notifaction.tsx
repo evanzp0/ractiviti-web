@@ -11,7 +11,7 @@ export default function Notification(
     }
 ) {
     return (
-        <Snackbar open={props.open} autoHideDuration={3000} onClose={props.onClose} anchorOrigin={{vertical: 'top', horizontal: 'center',}} sx={{ mt: 6 }}>
+        <Snackbar open={props.open} autoHideDuration={1000} onClose={props.onClose} anchorOrigin={{vertical: 'top', horizontal: 'center',}} sx={{ mt: 6 }}>
             <MuiAlert elevation={6} variant="filled" severity={props.severity} sx={{ width: '100%' }} onClose={props.onClose}>
                 {props.message}
             </MuiAlert>
