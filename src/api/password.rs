@@ -29,8 +29,28 @@ pub async fn change_password(Json(payload): Json<PasswordData>, session_facade: 
     // 修改密码
     let valid_rst = payload.validate();
     if let Err(e) = valid_rst {
-       println!("{:#?}", e);
+        let mut err_field = "";
+        let mut error = "".to_owned();
+        for (field, errors) in e.field_errors() {
+            // println!("{} - {:?}", field, errors[0].message);
+            err_field = field;
+            if let Some(e) = &errors[0].message {
+                error = e.to_string();
+            }
+            break;
+        }
+        
+        let password_result = FormInputResult::<()> {
+            is_ok: false,
+            err_code: Some(ErrorCode::InvalidInput),
+            err_field: Some(err_field),
+            error: Some(&error),
+            ..Default::default()
+        };
+
+        return Ok(Json(password_result).into_response());
     }
+
     let user_id = session_facade.get_user_id().await.unwrap();
     let new_password = md5(payload.new_password);
     user_service.change_password(&user_id, &new_password).await?;
