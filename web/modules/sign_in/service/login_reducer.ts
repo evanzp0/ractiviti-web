@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-import ILoginData from "../model/login_data";
+import ILoginData, {LoginResult} from "../model/login_data";
 import { AppThunkDispatch } from './login_store';
 import LoginService from '../service/login_service';
 
@@ -9,6 +9,8 @@ let initData: ILoginData = {
     password: '',
     remember: false,
 };
+
+
 
 export const loginSlice = createSlice({
     name: "login",
@@ -32,7 +34,8 @@ export const login = (loginData: ILoginData) => async (dispatch: AppThunkDispatc
 
     LoginService.login(loginData)
         .then((response: any) => {
-            if (response.is_pass) {
+            let rst = response as LoginResult;
+            if (rst.is_pass) {
                 if (remember) {
                     localStorage.setItem("loginData", JSON.stringify(loginData));
                 } else {
@@ -41,7 +44,7 @@ export const login = (loginData: ILoginData) => async (dispatch: AppThunkDispatc
 
                 dispatch(logined());
             } else {
-                throw "unexpected error";
+                alert(rst.error);
             }
         })
         .catch((e) => {

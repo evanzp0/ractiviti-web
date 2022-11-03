@@ -6,8 +6,8 @@ use serde::{Deserialize, Serialize};
 use crate::{service::SysUserService, common::WebResult, handles::{SessionFacadeInerface, SessionFacade}};
 
 pub async fn login(Json(payload): Json<LoginData>, mut session_facade: SessionFacade) -> WebResult<impl IntoResponse> {
-    let is_login = session_facade.is_login().await;
-    println!("is_login in login: {}", is_login);
+    // let is_login = session_facade.is_login().await;
+    // println!("is_login in login: {}", is_login);
 
     let sysuser_service = SysUserService::new();
     let verify_rst = sysuser_service.verify_sysuser(&payload.user_name, &payload.password).await;
