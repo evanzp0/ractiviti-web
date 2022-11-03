@@ -32,8 +32,7 @@ export const login = (loginData: ILoginData) => async (dispatch: AppThunkDispatc
 
     LoginService.login(loginData)
         .then((response: any) => {
-            if (response.data.is_pass) {
-
+            if (response.is_pass) {
                 if (remember) {
                     localStorage.setItem("loginData", JSON.stringify(loginData));
                 } else {
@@ -42,19 +41,12 @@ export const login = (loginData: ILoginData) => async (dispatch: AppThunkDispatc
 
                 dispatch(logined());
             } else {
-                alert(response.data.error);
+                throw "unexpected error";
             }
         })
-        // .catch((e) => {
-        //     if (e.response.data && e.response.data.error) {
-        //         alert(e.response.data.error);
-        //     } else if (e.response.data) {
-        //         alert(e.response.data);
-        //     } else {
-        //         alert(e);
-        //     }
-        //     console.log(e);
-        // })
+        .catch((e) => {
+            console.log(e);
+        })
 }
 
 // export function login(loginData: ILoginData) {

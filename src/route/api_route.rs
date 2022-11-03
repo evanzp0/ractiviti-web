@@ -1,11 +1,12 @@
 use axum::{Router, routing::{post, get}, response::IntoResponse};
 use hyper::StatusCode;
 
-use crate::{api::login::login, handles::{home, AuthLayer}};
+use crate::{api::{login::login, password::change_password}, handles::{home, AuthLayer}};
 
 pub fn api_route() -> Router {
     let unauthed_routes = Router::new()
-        .route("/login", post(login));
+        .route("/login", post(login))
+        .route("/change_password", post(change_password));
 
     let authed_routes = Router::new()
         .route("/home", get(home))

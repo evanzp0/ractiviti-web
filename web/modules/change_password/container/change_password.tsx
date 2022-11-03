@@ -2,12 +2,15 @@ import React, { useEffect, useState } from 'react';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import Grid from '@mui/material/Unstable_Grid2/Grid2';
 import { AlertColor, Box, Button, FormControl, InputLabel, TextField } from '@mui/material';
-import IPasswordData from '../model/password_data';
 import { object, string, TypeOf } from 'zod';
-import { SubmitHandler, useForm } from 'react-hook-form';
+import { FieldPath, SubmitHandler, useForm, UseFormSetError } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { LoadingButton } from '@mui/lab';
+
 import Notification from '../../../common/component/notifaction';
+import {ErrorCode} from '../../../common/model/error';
+import FormInputResult from '../../../common/model/form_input_result';
+import PasswordService from '../service/password_service';
 
 const theme = createTheme();
 
@@ -31,6 +34,7 @@ const passwordSchema = object({
 
 type PasswordInput = TypeOf<typeof passwordSchema>;
 let notify_severity : AlertColor = "info";
+let notify_message: string = '';
 
 export default function ChangePassword() {
     const [loading, setLoading] = useState(false);
@@ -46,21 +50,40 @@ export default function ChangePassword() {
         resolver: zodResolver(passwordSchema),
     });
 
-    useEffect(() => {
-        if (isSubmitSuccessful) {
-        //   reset();
-        }
-      }, [isSubmitSuccessful]);
+    // useEffect(() => {
+    //     if (isSubmitSuccessful) {
+    //         reset();
+    //     }
+    //   }, [isSubmitSuccessful]);
 
-    const handleChangePassword: SubmitHandler<PasswordInput> = (values) => {
-        // console.log(values);
-        // setLoading(true);
-        notify_severity = "success";
-        setNotifing(true);
+    const handleChangePassword: SubmitHandler<PasswordInput> = (data) => {
+        // console.log(data);
+        setLoading(true);
+        PasswordService.changePassword(data)
+            .then((result: any) => {
+                let rst = result as FormInputResult;
+                if (rst.is_ok) {
+                    notify_message = '密码修改成功！';
+                    notify_severity = "success";
+                    setNotifing(true);
+                    reset();
+                } else {
+                    if (rst.err_code == ErrorCode.InvalidInput) {
+                        setError(rst.err_field as FieldPath<PasswordInput> , { type: 'focus', message: result.error });
+                    } else {
+                        alert(result.error);
+                    }
+                }
 
-        // setError('password', { type: 'focus', message: '当前密码不正确' });
+                setLoading(false);
+            })
     };
     // console.log(errors);
+
+    const handleError = (errors: any, e: any) => {
+        console.log(errors, e);
+        throw new Error("e");
+    }
 
     const handleReset = (event: React.MouseEvent<HTMLElement>) => {
         event.preventDefault();
@@ -69,8 +92,8 @@ export default function ChangePassword() {
 
     return (
         <ThemeProvider theme={theme}>
-            <Notification open={notifing} message={'密码修改成功！'} severity={notify_severity} onClose={() => setNotifing(false)} />
-            <Box component="form" onSubmit={handleSubmit(handleChangePassword)} noValidate sx={{maxWidth: '20rem' }} >
+            <Notification open={notifing} message={notify_message} severity={notify_severity} onClose={() => setNotifing(false)} />
+            <Box component="form" onSubmit={handleSubmit(handleChangePassword, handleError)} noValidate sx={{maxWidth: '20rem' }} >
                 <FormControl variant="standard" fullWidth sx={{ mt: 1 }}>
                     <InputLabel shrink htmlFor="password">当前密码*</InputLabel>
                     <TextField

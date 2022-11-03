@@ -17,6 +17,7 @@ pub async fn login(Json(payload): Json<LoginData>, mut session_facade: SessionFa
             let login_result = LoginResult {
                 user_name: &sys_user.name,
                 error: None,
+                err_code: None,
                 is_pass: true
             };
             session_facade.set_user_id(sys_user.id.clone()).await;
@@ -31,6 +32,7 @@ pub async fn login(Json(payload): Json<LoginData>, mut session_facade: SessionFa
                 let login_result = LoginResult {
                     user_name: &payload.user_name,
                     error: Some(&"用户名或密码错误"),
+                    err_code: Some(ErrorCode::NotAuthorized),
                     is_pass: false
                 };
 
@@ -61,5 +63,6 @@ pub struct LoginData {
 pub struct LoginResult<'a> {
     user_name: &'a str,
     error: Option<&'a str>,
+    err_code: Option<ErrorCode>,
     is_pass: bool,
 }
