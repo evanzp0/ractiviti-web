@@ -17,16 +17,16 @@ const theme = createTheme();
 const passwordSchema = object({
     password: string()
         .min(1, '密码不可为空')
-        .min(5, '密码长度不能小于5位数')
-        .max(20, '密码长度不可超过20个'),
+        .min(5, '密码长度不能小于5')
+        .max(20, '密码长度不可超过20'),
     new_password: string()
         .min(1, '密码不可为空')
-        .min(5, '密码长度不能小于5位数')
-        .max(20, '密码长度不可超过20个'),
+        .min(5, '密码长度不能小于5')
+        .max(20, '密码长度不可超过20'),
     re_password: string()
         .min(1, '密码不可为空')
-        .min(5, '密码长度不能小于5位数')
-        .max(20, '密码长度不可超过20个'),
+        .min(5, '密码长度不能小于5')
+        .max(20, '密码长度不可超过20'),
 }).refine((data) => data.new_password === data.re_password, {
     path: ['re_password'],
     message: '两次输入的密码不一致',

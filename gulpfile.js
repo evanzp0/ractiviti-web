@@ -44,3 +44,11 @@ exports.cargoBuild = cargoBuild;
 exports.build = parallel(npmBuild, cargoBuild);
 exports.package = package;
 exports.release = series(clean, parallel(npmBuild, cargoBuild), package);
+
+
+function defaultTask(cb) {
+    // place code for your default task here
+    cb();
+  }
+  
+  exports.default = defaultTask

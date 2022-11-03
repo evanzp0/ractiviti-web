@@ -6,6 +6,7 @@ export enum ErrorCode {
     InvalidCredentials = 3001,
     NotAuthorized = 3002,
     NotFound = 4001,
+    SessionNotExist = 4002,
     FileSizeError = 5001,
     ParseError = 6001,
     UnexpectedError = 7001,

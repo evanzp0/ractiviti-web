@@ -21,6 +21,7 @@ pub async fn login(Json(payload): Json<LoginData>, mut session_facade: SessionFa
                 is_pass: true
             };
             session_facade.set_user_id(sys_user.id.clone()).await;
+            session_facade.set_user_name(sys_user.name.clone()).await;
 
             Ok(Json(login_result).into_response())
         },

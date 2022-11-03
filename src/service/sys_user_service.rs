@@ -1,7 +1,7 @@
 use ractiviti_core::common::db;
 use color_eyre::Result;
 
-use crate::{dao::ApfSysUserDao, model::ApfSysUser, common::utils::md5};
+use crate::{dao::ApfSysUserDao, model::{ApfSysUser, ApfSysUserDto}, common::utils::{md5, LocalTimeStamp}};
 
 
 pub struct SysUserService;
@@ -22,5 +22,23 @@ impl SysUserService {
         tran.commit().await?;
 
         Ok(sys_user)
+    }
+
+    pub async fn change_password(&self, user_id: &str, password: &str) -> Result<()> {
+        let mut conn = db::get_connect().await?;
+        let tran = conn.transaction().await?;
+
+        let sysuser_dao = ApfSysUserDao::new(&tran);
+        let user_dto = ApfSysUserDto {
+            id: Some(user_id.to_owned()),
+            password: Some(password.to_owned()),
+            update_time: Some(LocalTimeStamp::now().timestamp()),
+            ..Default::default()
+        };
+
+        sysuser_dao.change_password(&user_dto).await?;
+        tran.commit().await?;
+
+        Ok(())
     }
 }

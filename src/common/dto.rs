@@ -6,7 +6,7 @@ use serde::Serialize;
 pub struct FormInputResult<'a, T: Serialize> {
     pub is_ok: bool,
     pub err_code: Option<ErrorCode>,
-    pub err_field: &'a str,
+    pub err_field: Option<&'a str>,
     pub error: Option<&'a str>,
     pub data: Option<T>
 }

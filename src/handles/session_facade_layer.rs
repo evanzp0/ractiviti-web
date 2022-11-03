@@ -5,7 +5,9 @@ use futures::future::BoxFuture;
 use hyper::Request;
 use tower::{Layer, Service};
 use axum::{response::Response, body::BoxBody, extract::{FromRequest, RequestParts}, Extension};
-use axum_sessions::SessionHandle;
+
+use super::SessionHandle;
+// use axum_sessions::SessionHandle;
 
 pub const USER_ID_KEY: &str = "user_id";
 pub const USER_NAME_KEY: &str = "user_name";
@@ -119,7 +121,7 @@ impl SessionFacadeInerface for MemorySessionFacade {
 
     async fn set_user_name(&mut self, user_name: String) {
         let mut session = self.session_handle.write().await;
-        session.insert(USER_ID_KEY, user_name).expect("Could not store user_name");
+        session.insert(USER_NAME_KEY, user_name).expect("Could not store user_name");
     }
     
     async fn is_login(&self) -> bool {
