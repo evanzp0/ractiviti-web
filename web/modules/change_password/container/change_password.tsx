@@ -57,10 +57,10 @@ export default function ChangePassword() {
     //   }, [isSubmitSuccessful]);
 
     const handleChangePassword: SubmitHandler<PasswordInput> = (data) => {
-        // console.log(data);
         setLoading(true);
         PasswordService.changePassword(data)
             .then((result: any) => {
+                console.log(result);
                 let rst = result as FormInputResult;
                 if (rst.is_ok) {
                     notify_message = '密码修改成功！';

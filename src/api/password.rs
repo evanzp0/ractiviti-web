@@ -6,12 +6,12 @@ use crate::{handles::SessionFacade, common::{WebResult, dto::FormInputResult}};
 
 pub async fn change_password(Json(payload): Json<PasswordData>, mut session_facade: SessionFacade) -> WebResult<impl IntoResponse> {
     
-    let password_result = FormInputResult {
+    let password_result = FormInputResult::<()> {
         is_ok: false,
         err_code: Some(ErrorCode::InvalidInput),
         err_field: "password",
         error: Some("密码不正确"),
-        
+        ..Default::default()
     };
 
     Ok(Json(password_result).into_response())
