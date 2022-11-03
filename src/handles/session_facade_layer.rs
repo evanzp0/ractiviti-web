@@ -7,7 +7,6 @@ use tower::{Layer, Service};
 use axum::{response::Response, body::BoxBody, extract::{FromRequest, RequestParts}, Extension};
 
 use super::SessionHandle;
-// use axum_sessions::SessionHandle;
 
 pub const USER_ID_KEY: &str = "user_id";
 pub const USER_NAME_KEY: &str = "user_name";
