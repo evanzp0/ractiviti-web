@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import Grid from '@mui/material/Unstable_Grid2/Grid2';
-import { Box, Button, FormControl, InputLabel, TextField } from '@mui/material';
+import { AlertColor, Box, Button, FormControl, InputLabel, TextField } from '@mui/material';
 import IPasswordData from '../model/password_data';
 import { object, string, TypeOf } from 'zod';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { LoadingButton } from '@mui/lab';
+import Notification from '../../../common/component/notifaction';
 
 const theme = createTheme();
 
@@ -29,9 +30,11 @@ const passwordSchema = object({
 });
 
 type PasswordInput = TypeOf<typeof passwordSchema>;
+let notify_severity : AlertColor = "info";
 
 export default function ChangePassword() {
     const [loading, setLoading] = useState(false);
+    const [notifing, setNotifing] = useState(false);
     
     const {
         register,
@@ -45,13 +48,16 @@ export default function ChangePassword() {
 
     useEffect(() => {
         if (isSubmitSuccessful) {
-          reset();
+        //   reset();
         }
       }, [isSubmitSuccessful]);
 
     const handleChangePassword: SubmitHandler<PasswordInput> = (values) => {
         // console.log(values);
         // setLoading(true);
+        notify_severity = "success";
+        setNotifing(true);
+
         // setError('password', { type: 'focus', message: '当前密码不正确' });
     };
     // console.log(errors);
@@ -63,6 +69,7 @@ export default function ChangePassword() {
 
     return (
         <ThemeProvider theme={theme}>
+            <Notification open={notifing} message={'密码修改成功！'} severity={notify_severity} onClose={() => setNotifing(false)} />
             <Box component="form" onSubmit={handleSubmit(handleChangePassword)} noValidate sx={{maxWidth: '20rem' }} >
                 <FormControl variant="standard" fullWidth sx={{ mt: 1 }}>
                     <InputLabel shrink htmlFor="password">当前密码*</InputLabel>
