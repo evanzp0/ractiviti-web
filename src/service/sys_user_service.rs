@@ -36,7 +36,7 @@ impl SysUserService {
             ..Default::default()
         };
 
-        sysuser_dao.change_password(&user_dto).await?;
+        sysuser_dao.update(&user_dto).await?;
         tran.commit().await?;
 
         Ok(())

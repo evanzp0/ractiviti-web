@@ -1,3 +1,4 @@
+use ramhorns::Content;
 use serde::Serialize;
 use tokio_pg_mapper_derive::PostgresMapper;
 
@@ -12,7 +13,7 @@ pub struct ApfSysUser {
     pub update_time: Option<i64>,
 }
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Content)]
 pub struct ApfSysUserDto {
     pub id: Option<String>,
     pub name: Option<String>,

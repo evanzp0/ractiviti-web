@@ -1,3 +1,4 @@
+use dysql_macro::execute;
 use ractiviti_core::{dao::{BaseDao, Dao}, error::{AppError, ErrorCode}};
 use tokio_pg_mapper::FromTokioPostgresRow;
 use tokio_postgres::Transaction;
@@ -48,13 +49,16 @@ impl<'a> ApfSysUserDao<'a> {
         Ok(rst)
     }
 
-    pub async fn change_password(&self, user_dto: &ApfSysUserDto) -> Result<u64> {
-        let sql = "UPDATE apf_sys_user
-            SET password = $1,
-            update_time = $2
-            WHERE id = $3";
-        let stmt = self.tran().prepare(sql).await?;
-        let rst = self.tran().execute(&stmt, &[&user_dto.password, &user_dto.update_time, &user_dto.id]).await?;
+    pub async fn update(&self, user_dto: &ApfSysUserDto) -> Result<u64> {
+        let tran = self.tran();
+        let rst = execute!(|user_dto, tran| {
+            "UPDATE apf_sys_user
+            SET 
+            {{#name}}name = :name,{{/name}}
+            {{#password}}password = :password,{{/password}}
+            update_time = :update_time
+            WHERE id = :id"
+        }).unwrap();
 
         if rst == 1 {
             return Ok(rst)
