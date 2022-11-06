@@ -53,10 +53,9 @@ impl<'a> ApfSysUserDao<'a> {
         let tran = self.tran();
         let rst = execute!(|user_dto, tran| {
             "UPDATE apf_sys_user
-            SET 
-            {{#name}}name = :name,{{/name}}
-            {{#password}}password = :password,{{/password}}
-            update_time = :update_time
+            SET {{#name}}name = :name,{{/name}}
+                {{#password}}password = :password,{{/password}}
+                update_time = :update_time
             WHERE id = :id"
         }).unwrap();
 
