@@ -57,7 +57,7 @@ impl<'a> ApfSysUserDao<'a> {
                 {{#password}}password = :password,{{/password}}
                 update_time = :update_time
             WHERE id = :id"
-        }).unwrap();
+        })?;
 
         if rst == 1 {
             return Ok(rst)
