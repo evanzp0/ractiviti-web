@@ -1,7 +1,7 @@
-use ractiviti_core::common::db;
+use ractiviti_core::common::{db, md5, LocalTimeStamp};
 use color_eyre::Result;
 
-use crate::{dao::ApfSysUserDao, model::{ApfSysUser, ApfSysUserDto}, common::utils::{md5, LocalTimeStamp}};
+use crate::{dao::ApfSysUserDao, model::{ApfSysUser, ApfSysUserDto}};
 
 
 pub struct SysUserService;

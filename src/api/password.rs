@@ -1,9 +1,9 @@
 use axum::{Json, response::IntoResponse};
-use ractiviti_core::error::{ErrorCode, AppError};
+use ractiviti_core::{error::{ErrorCode, AppError}, common::md5};
 use serde::Deserialize;
 use validator::Validate;
 
-use crate::{handles::{SessionFacade, SessionFacadeInerface}, common::{WebResult, dto::FormInputResult, utils::md5}, service::SysUserService};
+use crate::{handles::{SessionFacade, SessionFacadeInerface}, common::{WebResult, dto::FormInputResult}, service::SysUserService};
 
 pub async fn change_password(Json(payload): Json<PasswordData>, session_facade: SessionFacade) -> WebResult<impl IntoResponse> {
     let user_service = SysUserService::new();

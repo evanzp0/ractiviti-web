@@ -13,8 +13,9 @@ use axum_sessions::{async_session::MemoryStore, extractors::WritableSession};
 use axum_sessions::{SessionLayer, SessionHandle};
 use handles::USER_ID_KEY;
 use hyper::{StatusCode, Request, Body};
+use ractiviti_core::common::{set_working_dir, gen_random_str};
 use crate::handles::{MemorySessionFacadeLayer, handler_error_layer};
-use crate::{common::utils::{set_working_dir, gen_random_str}, route::{page_route, api_route, client_route}};
+use crate::route::{page_route, api_route, client_route};
 
 #[tokio::main]
 async fn main() 

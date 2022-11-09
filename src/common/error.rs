@@ -5,13 +5,12 @@ use axum::Json;
 use axum::http::StatusCode;
 use axum::response::{IntoResponse, Response, Html};
 use color_eyre::Report;
+use ractiviti_core::common::gen_random_str;
 use ractiviti_core::error::{AppError, ErrorCode};
 use axum::http::{HeaderValue, HeaderMap};
 use serde::Serialize;
 use serde_json::json;
 use log4rs_macros::error;
-
-use crate::common::utils::gen_random_str;
 
 #[derive(Debug)]
 pub enum WebError {
