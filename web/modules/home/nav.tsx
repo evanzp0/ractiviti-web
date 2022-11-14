@@ -151,9 +151,9 @@ export default function ResponsiveDrawer(props: Props) {
                 }}
             >
                 <Toolbar>
-                    <Typography variant="h6" noWrap component="div">
+                    {/* <Typography variant="h6" noWrap component="div">
                         {currentModule}
-                    </Typography>
+                    </Typography> */}
                 </Toolbar>
             </AppBar>
             <Box
