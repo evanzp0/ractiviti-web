@@ -38,6 +38,7 @@
     "@mui/icons-material": "^5.10.6",
     "@mui/lab": "^5.0.0-alpha.106",
     "@mui/material": "^5.10.11",
+    "@mui/x-data-grid": "^5.17.11",
     "@reduxjs/toolkit": "^1.8.5",
     "axios": "^0.27.2",
     "axios-inherit": "^1.0.1",
