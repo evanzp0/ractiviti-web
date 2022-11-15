@@ -7,53 +7,108 @@ import Typography from "@mui/material/Typography";
 import { DataGrid, GridColDef, GridValueGetterParams } from '@mui/x-data-grid';
 
 import React from "react";
+import { SubmitHandler, useForm } from "react-hook-form";
+
+import Deployment from "../model/deployment";
+import DeploymentDto from "../model/deployment_dto";
+import {PageDto, Pagination as DeploymentPg} from "../../../common/model/pagination";
+import DeploymentService from "../service/deployment_service";
+
+let defaultPg: DeploymentPg<Deployment> = {
+    page_no: 0,
+    page_size: 10,
+    total: 0,
+    data: [],
+};
+
+let pg_dto: PageDto<DeploymentDto> = {
+    data: null,
+    page_no: 0,
+    page_size: 10,
+};
 
 export default function DeployManagement() {
-    const [pageSize, setPageSize] = React.useState<number>(5);
+    const [deploymentPg, setDeploymentPg] = React.useState<DeploymentPg<Deployment>>(defaultPg);
+
+    const {
+        register,
+        handleSubmit,
+    } = useForm<DeploymentDto>();
 
     const columns: GridColDef[] = [
         { field: 'id', headerName: 'ID', width: 90 },
         {
-            field: 'firstName',
-            headerName: 'First name',
+            field: 'name',
+            headerName: '流程名称',
             width: 150,
-            editable: true,
+            editable: false,
         },
         {
-            field: 'lastName',
-            headerName: 'Last name',
+            field: 'key',
+            headerName: '流程KEY',
             width: 150,
-            editable: true,
         },
         {
-            field: 'age',
-            headerName: 'Age',
-            type: 'number',
-            width: 110,
-            editable: true,
+            field: 'organization',
+            headerName: '公司',
+            width: 150,
         },
         {
-            field: 'fullName',
-            headerName: 'Full name',
-            description: 'This column has a value getter and is not sortable.',
+            field: 'deployer',
+            headerName: '部署人',
+            width: 150,
+        },
+        {
+            field: 'deploy_time',
+            headerName: '部署时间',
             sortable: false,
-            width: 160,
+            width: 150,
             valueGetter: (params: GridValueGetterParams) =>
-            `${params.row.firstName || ''} ${params.row.lastName || ''}`,
+            `${params.row.deploy_time || ''}`,
         },
     ];
         
-    const rows: Array<{id: number, lastName: string, firstName: string, age: number}> = [
-        { id: 1, lastName: 'Snow', firstName: 'Jon', age: 35 },
-        { id: 2, lastName: 'Lannister', firstName: 'Cersei', age: 42 },
-        { id: 3, lastName: 'Lannister', firstName: 'Jaime', age: 45 },
-        { id: 4, lastName: 'Stark', firstName: 'Arya', age: 16 },
-        { id: 5, lastName: 'Targaryen', firstName: 'Daenerys', age: 150 },
-        { id: 6, lastName: 'Melisandre', firstName: 'Daenerys', age: 150 },
-        { id: 7, lastName: 'Clifford', firstName: 'Ferrara', age: 44 },
-        { id: 8, lastName: 'Frances', firstName: 'Rossini', age: 36 },
-        { id: 9, lastName: 'Roxie', firstName: 'Harvey', age: 65 },
-    ];
+    const handlePageQuery: SubmitHandler<DeploymentDto> = (deployment_dto) => { 
+        pg_dto.data = deployment_dto;
+        pg_dto.page_no = 0;
+
+        DeploymentService.page_query(pg_dto)
+            .then((result: any) => {
+                let rst = result as DeploymentPg<Deployment>;
+
+                setDeploymentPg(rst);
+            }
+        );
+    };
+
+    const handleChangePageSize: (pageSize: number) => void = (pageSize) => {
+        if (pg_dto.data != null) {
+            pg_dto.page_size = pageSize;
+            pg_dto.page_no = 0;
+
+            DeploymentService.page_query(pg_dto)
+                .then((result: any) => {
+                    let rst = result as DeploymentPg<Deployment>;
+
+                    setDeploymentPg(rst);
+                }
+            );
+        }
+    };
+
+    const handleChangePageNo: (pageNo: number) => void = (pageNo) => { 
+        if (pg_dto.data != null) {
+            pg_dto.page_no = pageNo;
+
+            DeploymentService.page_query(pg_dto)
+                .then((result: any) => {
+                    let rst = result as DeploymentPg<Deployment>;
+
+                    setDeploymentPg(result);
+                }
+            );
+        }
+    };
 
     return (
         <Box sx={{width: '100%'}}>
@@ -66,35 +121,38 @@ export default function DeployManagement() {
                     <Button >高级查询</Button>
                 </Stack>
             </Toolbar>
-            <Box component="form" noValidate ml={2} mr={2} >
+            <Box component="form" onSubmit={handleSubmit(handlePageQuery)} noValidate ml={2} mr={2} >
                 <Stack direction="row" spacing={1} >
                     <TextField
                         label="流程ID"
                         type="text"
-                        id="deployment_id"
+                        id="id"
                         size='small'
+                        {...register('id')}
                     />
                     <TextField
                         label="流程名"
                         type="text"
-                        id="deployment_name"
+                        id="name"
                         size='small'
+                        {...register('name')}
                     />
-                    <Button variant="contained">查询</Button>
+                    <Button variant="contained" type='submit'>查询</Button>
                 </Stack>
-                <Box mt={2}>
+                <Box mt={2} style={{ height: 700, width: '100%' }}>
                     <DataGrid
-                        rows={rows}
-                        autoHeight
-                        columns={columns}
-                        checkboxSelection
+                        disableColumnFilter={true}
+                        // autoHeight = {true}
                         disableSelectionOnClick
                         paginationMode='server'
-                        page={0}
-                        pageSize={pageSize}
-                        onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-                        rowsPerPageOptions={[5, 10, 20]}
-                        rowCount={12}
+                        rows={deploymentPg.data}
+                        columns={columns}
+                        page={deploymentPg.page_no}
+                        pageSize={deploymentPg.page_size}
+                        rowsPerPageOptions={[10, 20, 50]}
+                        rowCount={deploymentPg.total}
+                        onPageSizeChange={(newPageSize) => handleChangePageSize(newPageSize)}
+                        onPageChange={(pageNo) => handleChangePageNo(pageNo)}
                     />
                 </Box>
             </Box>

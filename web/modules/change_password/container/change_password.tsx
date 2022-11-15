@@ -76,7 +76,8 @@ export default function ChangePassword() {
                 }
 
                 setLoading(false);
-            })
+            }
+        );
     };
     // console.log(errors);
 
