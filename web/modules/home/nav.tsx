@@ -39,14 +39,14 @@ let flow_menus = [
         icon: <InboxIcon />,
     },
     {
-        name: '部署管理',
-        url: '/deploy_manage',
-        icon: <MailIcon />,
-    },
-    {
         name: '流程管理',
         url: '/process_manage',
         icon: <InboxIcon />,
+    },
+    {
+        name: '发布日志',
+        url: '/deploy_manage',
+        icon: <MailIcon />,
     },
 ];
 

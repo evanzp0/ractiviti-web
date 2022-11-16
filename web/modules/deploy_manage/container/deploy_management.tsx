@@ -57,12 +57,12 @@ export default function DeployManagement() {
         },
         {
             field: 'deployer',
-            headerName: '部署人',
+            headerName: '发布人',
             width: 150,
         },
         {
             field: 'deploy_time',
-            headerName: '部署时间',
+            headerName: '发布时间',
             sortable: false,
             width: 150,
             valueGetter: (params: GridValueGetterParams) =>
@@ -100,10 +100,10 @@ export default function DeployManagement() {
         <Box sx={{width: '100%'}}>
             <Toolbar>
                 <Typography variant="h5" noWrap component="div" >
-                        部署管理
+                        发布日志
                 </Typography>
                 <Stack direction="row" spacing={0} ml={2}>
-                    <Button >新增</Button>
+                    <Button >新增流程</Button>
                     <Button >高级查询</Button>
                 </Stack>
             </Toolbar>
