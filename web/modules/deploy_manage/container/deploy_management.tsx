@@ -131,7 +131,7 @@ export default function DeployManagement() {
                         columns={columns}
                         page={deploymentPg.page_no + 1}
                         count={deploymentPg.total_page}
-                        onChange={(event, pageNo) => handleChangePageNo(pageNo - 1)}
+                        onChange={(_, pageNo) => handleChangePageNo(pageNo - 1)}
                     />
                 </Box>
             </Box>
