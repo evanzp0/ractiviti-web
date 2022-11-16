@@ -4,6 +4,6 @@ export default interface DeploymentDto {
     key: string | null,
     organization: string | null,
     deployer: string | null,
-    deploy_time_start: number | null,
-    deploy_time_end: number | null,
+    deploy_time_from: number | string | null,
+    deploy_time_to: number | string | null,
 }

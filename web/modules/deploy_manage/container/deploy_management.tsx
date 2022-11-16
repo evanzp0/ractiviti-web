@@ -4,7 +4,10 @@ import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
-import { DataGrid, GridColDef, GridValueGetterParams } from '@mui/x-data-grid';
+import { GridColDef, GridValueGetterParams } from '@mui/x-data-grid';
+// import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker';
+// import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+// import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 
 import React from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
@@ -14,6 +17,7 @@ import DeploymentDto from "../model/deployment_dto";
 import {PageDto, Pagination as DeploymentPg} from "../../../common/model/pagination";
 import DeploymentService from "../service/deployment_service";
 import PageDataGrid from "../../../common/component/data_grid";
+import {dts_to_utc, utc_to_dt} from "../../../common/util/datetime";
 
 let defaultPg: DeploymentPg<Deployment> = {
     page_no: 0,
@@ -64,13 +68,18 @@ export default function DeployManagement() {
             field: 'deploy_time',
             headerName: '发布时间',
             sortable: false,
-            width: 150,
+            width: 250,
             valueGetter: (params: GridValueGetterParams) =>
-            `${params.row.deploy_time || ''}`,
+            `${utc_to_dt(params.row.deploy_time).toLocaleString('zh-CN')}`,
         },
     ];
         
     const handlePageQuery: SubmitHandler<DeploymentDto> = (deployment_dto) => { 
+        console.log(deployment_dto);
+
+        deployment_dto.deploy_time_from = dts_to_utc(deployment_dto.deploy_time_from!.toString());
+        deployment_dto.deploy_time_to = dts_to_utc(deployment_dto.deploy_time_to!.toString());
+
         pg_dto.data = deployment_dto;
         pg_dto.page_no = 0;
 
@@ -104,7 +113,6 @@ export default function DeployManagement() {
                 </Typography>
                 <Stack direction="row" spacing={0} ml={2}>
                     <Button >新增流程</Button>
-                    <Button >高级查询</Button>
                 </Stack>
             </Toolbar>
             <Box component="form" onSubmit={handleSubmit(handlePageQuery)} noValidate ml={2} mr={2} >
@@ -122,6 +130,42 @@ export default function DeployManagement() {
                         id="name"
                         size='small'
                         {...register('name')}
+                    />
+                    <TextField
+                        label="流程KEY"
+                        type="text"
+                        id="name"
+                        size='small'
+                        {...register('key')}
+                    />
+                    <TextField
+                        label="发布人"
+                        type="text"
+                        id="name"
+                        size='small'
+                        {...register('deployer')}
+                    />
+                    <TextField
+                        id="deploy_time_from"
+                        label="发布日期From"
+                        type="date"
+                        size='small'
+                        sx={{ width: 220 }}
+                        InputLabelProps={{
+                            shrink: true,
+                        }}
+                        {...register('deploy_time_from')}
+                    />
+                    <TextField
+                        id="deploy_time_to"
+                        label="发布日期To"
+                        type="date"
+                        size='small'
+                        sx={{ width: 220 }}
+                        InputLabelProps={{
+                            shrink: true,
+                        }}
+                        {...register('deploy_time_to')}
                     />
                     <Button variant="contained" type='submit'>查询</Button>
                 </Stack>
