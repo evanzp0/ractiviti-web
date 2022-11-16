@@ -13,10 +13,11 @@ import Deployment from "../model/deployment";
 import DeploymentDto from "../model/deployment_dto";
 import {PageDto, Pagination as DeploymentPg} from "../../../common/model/pagination";
 import DeploymentService from "../service/deployment_service";
+import Pagination from "@mui/material/Pagination";
 
 let defaultPg: DeploymentPg<Deployment> = {
     page_no: 0,
-    page_size: 10,
+    page_size: 2,
     total: 0,
     data: [],
 };
@@ -24,7 +25,7 @@ let defaultPg: DeploymentPg<Deployment> = {
 let pg_dto: PageDto<DeploymentDto> = {
     data: null,
     page_no: 0,
-    page_size: 10,
+    page_size: 2,
 };
 
 export default function DeployManagement() {
@@ -81,21 +82,6 @@ export default function DeployManagement() {
         );
     };
 
-    const handleChangePageSize: (pageSize: number) => void = (pageSize) => {
-        if (pg_dto.data != null) {
-            pg_dto.page_size = pageSize;
-            pg_dto.page_no = 0;
-
-            DeploymentService.page_query(pg_dto)
-                .then((result: any) => {
-                    let rst = result as DeploymentPg<Deployment>;
-
-                    setDeploymentPg(rst);
-                }
-            );
-        }
-    };
-
     const handleChangePageNo: (pageNo: number) => void = (pageNo) => { 
         if (pg_dto.data != null) {
             pg_dto.page_no = pageNo;
@@ -103,7 +89,6 @@ export default function DeployManagement() {
             DeploymentService.page_query(pg_dto)
                 .then((result: any) => {
                     let rst = result as DeploymentPg<Deployment>;
-
                     setDeploymentPg(result);
                 }
             );
@@ -142,16 +127,14 @@ export default function DeployManagement() {
                 <Box mt={2} style={{ height: 700, width: '100%' }}>
                     <DataGrid
                         disableColumnFilter={true}
-                        // autoHeight = {true}
+                        autoHeight = {true}
                         disableSelectionOnClick
                         paginationMode='server'
                         rows={deploymentPg.data}
                         columns={columns}
                         page={deploymentPg.page_no}
                         pageSize={deploymentPg.page_size}
-                        rowsPerPageOptions={[10, 20, 50]}
                         rowCount={deploymentPg.total}
-                        onPageSizeChange={(newPageSize) => handleChangePageSize(newPageSize)}
                         onPageChange={(pageNo) => handleChangePageNo(pageNo)}
                     />
                 </Box>
