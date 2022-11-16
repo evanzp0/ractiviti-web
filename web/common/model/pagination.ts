@@ -9,4 +9,5 @@ export interface Pagination<T> {
     page_size: number,
     page_no: number,
     total: number,
+    total_page: number,
 }

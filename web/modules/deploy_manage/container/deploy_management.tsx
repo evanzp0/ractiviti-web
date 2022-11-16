@@ -19,6 +19,7 @@ let defaultPg: DeploymentPg<Deployment> = {
     page_no: 0,
     page_size: 2,
     total: 0,
+    total_page: 0,
     data: [],
 };
 
@@ -132,10 +133,23 @@ export default function DeployManagement() {
                         paginationMode='server'
                         rows={deploymentPg.data}
                         columns={columns}
-                        page={deploymentPg.page_no}
-                        pageSize={deploymentPg.page_size}
-                        rowCount={deploymentPg.total}
-                        onPageChange={(pageNo) => handleChangePageNo(pageNo)}
+                        components={{
+                            Pagination: () => 
+                                <Pagination
+                                    color="primary"
+                                    page={deploymentPg.page_no + 1}
+                                    count={deploymentPg.total_page}
+                                    onChange={(event, pageNo) => handleChangePageNo(pageNo - 1)}
+                                />
+                        }}
+                        sx={{
+                            '& .MuiDataGrid-footerContainer': {
+                                display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: 'center',
+                                justifyContent: 'center'
+                            }
+                        }}
                     />
                 </Box>
             </Box>
