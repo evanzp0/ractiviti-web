@@ -6,18 +6,14 @@ use ractiviti_core::{dto::DeploymentDto, service::engine::RepositoryService, com
 use crate::common::WebResult;
 
 
-pub async fn deployment_query(Json(pg_dto): Json<PageDto<DeploymentDto>>) -> WebResult<impl IntoResponse> {
+pub async fn deployment_query(Json(mut pg_dto): Json<PageDto<DeploymentDto>>) -> WebResult<impl IntoResponse> {
     
-    let pg_dto = if let Some(dt) = pg_dto.data.deploy_time_to {
-        let mut tmp_dto = pg_dto.clone();
-        tmp_dto.data.deploy_time_to = Some(LocalTimeStamp::new(dt).add_days(1).timestamp_millis());
-        tmp_dto
-    } else {
-        pg_dto
-    };
+    if let Some(dt) = pg_dto.data.deploy_time_to {
+        pg_dto.data.deploy_time_to = Some(LocalTimeStamp::new(dt).add_days(1).timestamp_millis());
+    }
 
     let repo_service = RepositoryService::new();
-    let rst = repo_service.query_deployment_by_page(&pg_dto).await?;
+    let rst = repo_service.query_deployment_by_page(&mut pg_dto).await?;
 
     Ok((StatusCode::OK, Json(rst)).into_response())
 }
