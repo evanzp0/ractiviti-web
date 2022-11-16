@@ -13,7 +13,7 @@ import Deployment from "../model/deployment";
 import DeploymentDto from "../model/deployment_dto";
 import {PageDto, Pagination as DeploymentPg} from "../../../common/model/pagination";
 import DeploymentService from "../service/deployment_service";
-import Pagination from "@mui/material/Pagination";
+import PageDataGrid from "../../../common/component/data_grid";
 
 let defaultPg: DeploymentPg<Deployment> = {
     page_no: 0,
@@ -126,30 +126,12 @@ export default function DeployManagement() {
                     <Button variant="contained" type='submit'>查询</Button>
                 </Stack>
                 <Box mt={2} style={{ height: 700, width: '100%' }}>
-                    <DataGrid
-                        disableColumnFilter={true}
-                        autoHeight = {true}
-                        disableSelectionOnClick
-                        paginationMode='server'
+                    <PageDataGrid 
                         rows={deploymentPg.data}
                         columns={columns}
-                        components={{
-                            Pagination: () => 
-                                <Pagination
-                                    color="primary"
-                                    page={deploymentPg.page_no + 1}
-                                    count={deploymentPg.total_page}
-                                    onChange={(event, pageNo) => handleChangePageNo(pageNo - 1)}
-                                />
-                        }}
-                        sx={{
-                            '& .MuiDataGrid-footerContainer': {
-                                display: 'flex',
-                                flexDirection: 'column',
-                                alignItems: 'center',
-                                justifyContent: 'center'
-                            }
-                        }}
+                        page={deploymentPg.page_no + 1}
+                        count={deploymentPg.total_page}
+                        onChange={(event, pageNo) => handleChangePageNo(pageNo - 1)}
                     />
                 </Box>
             </Box>
