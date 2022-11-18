@@ -146,7 +146,7 @@ export default function DeployManagement() {
                     <DateField 
                         id="deploy_time_from"
                         name="deploy_time_from" 
-                        label="发布日期To" 
+                        label="发布日期From" 
                         sx={{ width: 220 }}
                         size='small'
                         inputFormat='YYYY/MM/DD'
