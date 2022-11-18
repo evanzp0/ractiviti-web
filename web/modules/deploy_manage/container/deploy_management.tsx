@@ -5,9 +5,6 @@ import TextField from "@mui/material/TextField";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import { GridColDef, GridValueGetterParams } from '@mui/x-data-grid';
-// import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker';
-// import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-// import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 
 import React from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
@@ -18,6 +15,8 @@ import {PageDto, Pagination as DeploymentPg} from "../../../common/model/paginat
 import DeploymentService from "../service/deployment_service";
 import PageDataGrid from "../../../common/component/data_grid";
 import {dts_to_utc, utc_to_dt} from "../../../common/util/datetime";
+import DateField from "../../../common/component/data_field";
+import { Dayjs } from "dayjs";
 
 let defaultPg: DeploymentPg<Deployment> = {
     page_no: 0,
@@ -39,6 +38,7 @@ export default function DeployManagement() {
     const {
         register,
         handleSubmit,
+        control,
     } = useForm<DeploymentDto>();
 
     const columns: GridColDef[] = [
@@ -74,11 +74,9 @@ export default function DeployManagement() {
         },
     ];
         
-    const handlePageQuery: SubmitHandler<DeploymentDto> = (deployment_dto) => { 
-        console.log(deployment_dto);
-
-        deployment_dto.deploy_time_from = dts_to_utc(deployment_dto.deploy_time_from!.toString());
-        deployment_dto.deploy_time_to = dts_to_utc(deployment_dto.deploy_time_to!.toString());
+    const handlePageQuery: SubmitHandler<DeploymentDto> = (deployment_dto) => {
+        deployment_dto.deploy_time_from = (deployment_dto.deploy_time_from as Dayjs)?.valueOf();
+        deployment_dto.deploy_time_to = (deployment_dto.deploy_time_to as Dayjs)?.valueOf();
 
         pg_dto.data = deployment_dto;
         pg_dto.page_no = 0;
@@ -145,27 +143,23 @@ export default function DeployManagement() {
                         size='small'
                         {...register('deployer')}
                     />
-                    <TextField
+                    <DateField 
                         id="deploy_time_from"
-                        label="发布日期From"
-                        type="date"
-                        size='small'
+                        name="deploy_time_from" 
+                        label="发布日期To" 
                         sx={{ width: 220 }}
-                        InputLabelProps={{
-                            shrink: true,
-                        }}
-                        {...register('deploy_time_from')}
+                        size='small'
+                        inputFormat='YYYY/MM/DD'
+                        control={control}
                     />
-                    <TextField
+                    <DateField 
                         id="deploy_time_to"
-                        label="发布日期To"
-                        type="date"
-                        size='small'
+                        name="deploy_time_to" 
+                        label="发布日期To" 
                         sx={{ width: 220 }}
-                        InputLabelProps={{
-                            shrink: true,
-                        }}
-                        {...register('deploy_time_to')}
+                        size='small'
+                        inputFormat='YYYY/MM/DD'
+                        control={control}
                     />
                     <Button variant="contained" type='submit'>查询</Button>
                 </Stack>

@@ -6,7 +6,11 @@ export function utc_to_dt(utc_mils_sec: number) {
     return d;
 }
 
-export function dts_to_utc(date: string) {
+export function dts_to_utc(date: string | undefined) {
+    if (date == undefined) {
+        return null;
+    }
+
     let rst = date.trim() == "" ? null : Date.parse(date);
 
     return rst;
