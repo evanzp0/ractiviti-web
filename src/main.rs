@@ -11,11 +11,12 @@ use axum::routing::get;
 use axum::{Router,  middleware::from_fn};
 use axum_sessions::{async_session::MemoryStore, extractors::WritableSession};
 use axum_sessions::{SessionLayer, SessionHandle};
+use route::client_route::{bpmn_route, nav_route};
 use handles::USER_ID_KEY;
 use hyper::{StatusCode, Request, Body};
 use ractiviti_core::common::{set_working_dir, gen_random_str};
 use crate::handles::{MemorySessionFacadeLayer, handler_error_layer};
-use crate::route::{page_route, api_route, client_route};
+use crate::route::{page_route, api_route};
 
 #[tokio::main]
 async fn main() 
@@ -34,7 +35,8 @@ async fn main()
     let app = Router::new()
         .merge(page_route())
         .merge(api_route())
-        .merge(client_route())
+        .merge(nav_route())
+        .merge(bpmn_route())
         .route("/session_write", get(session_write))
         .route("/session_read", get(session_read))
         .layer(MemorySessionFacadeLayer::new())
@@ -56,9 +58,6 @@ pub async fn session_write(mut session: WritableSession) -> impl IntoResponse{
     session
         .insert(USER_ID_KEY, &r)
         .expect("Could not store the answer.");
-
-
-
     (StatusCode::OK, format!("OK: {}", r))
 }
 

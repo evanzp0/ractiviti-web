@@ -1,9 +1,9 @@
 use axum::{Router, routing::get};
 
-use crate::handles::{home, bpmn};
+use crate::handles::{home, AuthLayer, new_bpmn, create_bpmn, get_bpmn, update_bpmn, delete_bpmn};
 
 
-pub fn client_route() -> Router {
+pub fn nav_route() -> Router {
     let routes = Router::new()
         .route("/dashboard", get(home))
         .route("/deploy_manage", get(home))
@@ -11,7 +11,19 @@ pub fn client_route() -> Router {
         .route("/user_manager", get(home))
         .route("/change_password", get(home))
         .route("/logout", get(home))
-        .route("/bpmn", get(bpmn));
+        .layer(AuthLayer::new());
+
+    routes
+}
+
+pub fn bpmn_route() -> Router {
+    let authed_routes = Router::new()
+        .route("/new", get(new_bpmn).post(create_bpmn))
+        .route("/{proc_def_id}", get(get_bpmn).post(update_bpmn).delete(delete_bpmn))
+        .layer(AuthLayer::new());
+
+    let routes = Router::new().nest("/bpmn", authed_routes);
+
         
     routes
 }

@@ -26,7 +26,7 @@ impl<'a> ApfSysUserDao<'a> {
 
     pub async fn get_by_name(&self, name: &str, password: &str) -> Result<ApfSysUser> {
         let sql = r#"
-            SELECT id, name, password, create_time, update_time
+            SELECT id, name, nick_name, password, company_id, create_time, update_time
             FROM apf_sys_user 
             WHERE name = $1
                 AND password = $2
@@ -54,6 +54,7 @@ impl<'a> ApfSysUserDao<'a> {
         let rst = execute!(|user_dto, tran| {
             "UPDATE apf_sys_user
             SET {{#name}}name = :name,{{/name}}
+                {{#nick_name}}name = :name,{{/nick_name}}
                 {{#password}}password = :password,{{/password}}
                 update_time = :update_time
             WHERE id = :id"
