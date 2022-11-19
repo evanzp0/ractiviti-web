@@ -1,0 +1,51 @@
+<templates>
+    <template name="sequenceFlow" title="Sequence Flow" tag="sequence flow">
+        <sequenceFlow name="">
+            <mxCell edge="1" >
+                <mxGeometry as="geometry" width="100" relative="1"/>
+            </mxCell>
+        </sequenceFlow>
+    </template>
+    <template  name="startEvent" title="Start Event" tag="start event">
+        <startEvent name="">
+            <mxCell vertex="1" style="ellipse;" >		
+                <mxGeometry as="geometry" width="40" height="40"/>
+            </mxCell>
+        </startEvent>
+    </template>
+    <template name="endEvent" title="End Event" tag="end event">
+        <endEvent name="">
+            <mxCell vertex="1" style="ellipse;shape=endEvent;noHoverIcon=1;">		
+                <mxGeometry as="geometry" width="40" height="40"/>
+            </mxCell>
+        </endEvent>
+    </template>
+    <template name="userTask" title="UserTask" tag="user task">
+        <userTask name="" fromKey="">
+            <mxCell vertex="1" style="shape=userTask;whiteSpace=wrap;">		
+                <mxGeometry as="geometry" width="150" height="80"/>
+            </mxCell>
+        </userTask>
+    </template>
+    <template name="serviceTask" title="ServiceTask" tag="service task">
+        <serviceTask name="" fromKey="">
+            <mxCell vertex="1" style="shape=serviceTask;whiteSpace=wrap;">		
+                <mxGeometry as="geometry" width="150" height="80"/>
+            </mxCell>
+        </serviceTask>
+    </template>
+    <template name="exclusiveGateway" title="Exclusive Gateway" tag="exclusive execution or join">
+        <exclusiveGateway name="">
+            <mxCell vertex="1" style="rhombus;shape=exclusiveGateway;rounded=1;" >		
+                <mxGeometry as="geometry" width="50" height="50"/>
+            </mxCell>
+        </exclusiveGateway>
+    </template>
+    <template name="parallelGateway" title="Parallel Gateway"  tag="parallel execution or join">
+        <parallelGateway name="">
+            <mxCell vertex="1" style="rhombus;shape=parallelGateway;rounded=1;">		
+                <mxGeometry as="geometry" width="50" height="50"/>
+            </mxCell>
+        </parallelGateway>
+    </template>
+</templates>

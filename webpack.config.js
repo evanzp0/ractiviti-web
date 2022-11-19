@@ -43,6 +43,7 @@ module.exports = {
     plugins: [
         new HtmlWebpackPlugin(htmlpack_option('home', './web/common/template/index.html')),
         new HtmlWebpackPlugin(htmlpack_option('sign_in', './web/modules/sign_in/index.html')),
+        new HtmlWebpackPlugin(htmlpack_option('bpmn', './web/modules/bpmn/index.html')),
         new CopyPlugin({
             patterns: [
                 { from: "./web/robots.txt", to: "./" },

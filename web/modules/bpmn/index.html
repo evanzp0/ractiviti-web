@@ -1,0 +1,636 @@
+<!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=5,IE=9" ><![endif]-->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Grapheditor</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="stylesheet" type="text/css" href="assets/js/bpmn_editor/styles/grapheditor.css">
+	<script type="text/javascript">
+		// Parses URL parameters. Supported parameters are:
+		// - lang=xy: Specifies the language of the user interface.
+		// - touch=1: Enables a touch-style user interface.
+		// - storage=local: Enables HTML5 local storage.
+		// - chrome=0: Chromeless mode.
+		var urlParams = (function(url)
+		{
+			var result = new Object();
+			var idx = url.lastIndexOf('?');
+	
+			if (idx > 0)
+			{
+				var params = url.substring(idx + 1).split('&');
+				
+				for (var i = 0; i < params.length; i++)
+				{
+					idx = params[i].indexOf('=');
+					
+					if (idx > 0)
+					{
+						result[params[i].substring(0, idx)] = params[i].substring(idx + 1);
+					}
+				}
+			}
+			
+			return result;
+		})(window.location.href);
+	
+		// Default resources are included in grapheditor resources
+		mxLoadResources = false;
+		mxBasePath = "assets/js/mxgraph/";
+		bpmnEditorBasePath = "assets/js/bpmn_editor/"
+	</script>
+	<script type="text/javascript" src="assets/js/bpmn_editor/js/mxeditor/Init.js"></script>
+	<script type="text/javascript" src="assets/js/bpmn_editor/js/deflate/pako.min.js"></script>
+	<script type="text/javascript" src="assets/js/bpmn_editor/js/deflate/base64.js"></script>
+	<script type="text/javascript" src="assets/js/bpmn_editor/js/sanitizer/sanitizer.min.js"></script>
+	<script type="text/javascript" src="assets/js/mxgraph/js/mxClient.js"></script>
+	<script type="text/javascript" src="assets/js/bpmn_editor/js/mxeditor/EditorUi.js"></script>
+	<script type="text/javascript" src="assets/js/bpmn_editor/js/mxeditor/Editor.js"></script>
+	<script type="text/javascript" src="assets/js/bpmn_editor/js/mxeditor/Sidebar.js"></script>
+	<script type="text/javascript" src="assets/js/bpmn_editor/js/mxeditor/Graph.js"></script>
+	<script type="text/javascript" src="assets/js/bpmn_editor/js/mxeditor/Shapes.js"></script>
+	<script type="text/javascript" src="assets/js/bpmn_editor/js/mxeditor/Actions.js"></script>
+	<script type="text/javascript" src="assets/js/bpmn_editor/js/mxeditor/Menus.js"></script>
+	<script type="text/javascript" src="assets/js/bpmn_editor/js/mxeditor/Toolbar.js"></script>
+	<script type="text/javascript" src="assets/js/bpmn_editor/js/mxeditor/Dialogs.js"></script>
+</head>
+<body class="geEditor">
+<script type="text/javascript">
+	/**
+	 * Creates a temporary graph instance for rendering off-screen content.
+	 */
+	EditorUi.prototype.getCellsForShapePicker = function (cell) {
+		var templates = this.editor.templates;
+
+		var createVertex = mxUtils.bind(this, function (fn, style, w, h, value) {
+			if (fn != undefined) {
+				return fn();
+			} else {
+				return this.editor.graph.createVertex(null, null, value || '', 0, 0, w || 120, h || 60, style, false);
+			}
+
+		});
+
+		return [
+			// createVertex(function(){
+			// 	var cell = new mxCell('', new mxGeometry(0, 0, 150, 80), 'html=1;align=center;rounded=1;absoluteArcSize=1;arcSize=20;dashed=0;');
+			// 	cell.vertex = true;
+
+			// 	var cell1 = new mxCell('', new mxGeometry(0, 0, 16, 16), 'shape=mxgraph.bpmn.user_task;html=1;outlineConnect=0;strokeWidth=1;constituent=1;');
+			// 	cell1.vertex = true;
+			// 	cell1.geometry.relative = true;
+			// 	cell1.geometry.offset = new mxPoint(7, 7);
+			// 	cell.insert(cell1);
+
+			// 	return cell;
+			// }),
+
+			createVertex(null, templates["exclusiveGateway"].style, 50, 50, templates["exclusiveGateway"].value),
+			createVertex(null, templates["parallelGateway"].style, 50, 50, templates["parallelGateway"].value),
+			createVertex(null, templates["userTask"].style, 150, 80, templates["userTask"].value),
+			createVertex(null, templates["endEvent"].style, 50, 50, templates["endEvent"].value)
+		];
+	};
+
+	mxGraph.prototype.vertexLabelsMovable = true;
+	mxGraph.prototype.htmlLabels = true;
+	
+	/**
+	 * Returns the label for the given cell.
+	 */
+	Graph.prototype.convertValueToString = function (cell) {
+		if (cell.isEdge()) {
+			var expr_el_list = cell.value.getElementsByTagName("conditionExpression");
+			if (expr_el_list.length == 1) {
+				var expr_el = expr_el_list[0];
+				return expr_el.textContent.trim();
+			} else {
+				return "";
+			}
+		} else if (cell.isVertex()) {
+			return cell.getAttribute('name');
+		}
+	};
+
+	mxGraph.prototype.isLabelMovable = function (cell) {
+		var label = this.convertValueToString(cell);
+		return !this.isCellLocked(cell) && label != null && label.trim() != "" &&
+			((this.model.isEdge(cell) && this.edgeLabelsMovable) || (this.model.isVertex(cell) && this.vertexLabelsMovable));
+	};
+
+	function encodeBpmn(model) {
+		var doc = mxUtils.createXmlDocument();
+		var root = model.root;
+
+		// definitions
+		var definitions = doc.createElement("definitions");
+
+		// process
+		var process_id = root.getAttribute("name");
+		var process_name = root.getAttribute("description");
+		var process = doc.createElement("process");
+		process.setAttribute("id", process_id);
+		process.setAttribute("name", process_name);
+
+		// BPMNDiagram
+		var BPMNDiagram = doc.createElement("BPMNDiagram");
+		BPMNDiagram.setAttribute("id", "BPMNDiagram_" + process_id);
+		var BPMNPlane = doc.createElement("BPMNPlane");
+		BPMNPlane.setAttribute("id", "BPMNPlane_" + process_id);
+		BPMNPlane.setAttribute("bpmnElement", process_id);
+		BPMNDiagram.appendChild(BPMNPlane);
+
+		definitions.appendChild(process);
+
+		// skip default layer
+		if (root.children.length == 0) {
+			return definitions;
+		}
+
+		var children = root.children[0].children;
+
+		if (children !=null ) {
+			for (var i = 0; i < children.length; i++) {
+			var node_id = children[i].id;
+
+			var is_vertex = children[i].isVertex();
+			var node_name = children[i].value.nodeName;
+			var node = doc.createElement(node_name);
+			node.setAttribute("id", node_id);
+
+			var shape = doc.createElement("BPMNShape");
+			shape.setAttribute("id", "BPMNShape_" + node_id);
+			shape.setAttribute("bpmnElement", node_id);
+
+			if (is_vertex) {
+				var name = children[i].getAttribute("name");
+				node.setAttribute("name", name);
+
+				if (node_name == "serviceTask") {
+					var from_key = children[i].getAttribute("fromKey");
+					node.setAttribute("fromKey", from_key);
+				}
+
+				var bounds = doc.createElement("Bounds");
+				var geometry = children[i].geometry;
+				bounds.setAttribute("x", geometry.x);
+				bounds.setAttribute("y", geometry.y);
+				bounds.setAttribute("height", geometry.height);
+				bounds.setAttribute("width", geometry.width);
+
+				shape.appendChild(bounds);
+			} else {
+				// create sourceRef targetRef attribute
+				if (children[i].source) {
+					var source_id = children[i].source.id;
+					node.setAttribute("sourceRef", source_id);
+				}
+
+				if (children[i].target) {
+					var target_id = children[i].target.id;
+					node.setAttribute("targetRef", target_id);
+				}
+
+				// create conditionExpression node
+				if (children[i].value.children.length > 0 
+						&& children[i].value.children[0].nodeName == "conditionExpression") {
+					var o_expr_el = children[i].value.children[0];
+					var o_expr_cnt = o_expr_el.textContent.trim();
+
+					var expr_el = doc.createElement("conditionExpression");
+					var cdata = doc.createCDATASection(o_expr_cnt);
+					expr_el.appendChild(cdata);
+
+					node.appendChild(expr_el);
+				}
+
+				// create style attribute
+				var style = children[i].style;
+				if (style) {
+					shape.setAttribute("style", style);
+				}
+				
+				// create waypoint node
+				var geometry = children[i].geometry;
+				if (geometry.points) {
+					var points = geometry.points;
+					for (var j = 0; j < points.length; j++) {
+						var waypoint = doc.createElement("waypoint");
+						waypoint.setAttribute("x", points[j].x);
+						waypoint.setAttribute("y", points[j].y);
+						shape.appendChild(waypoint);
+					}
+				}
+			}
+
+			process.appendChild(node);
+			BPMNPlane.appendChild(shape);
+		}
+		}
+		definitions.appendChild(process);
+		definitions.appendChild(BPMNDiagram);
+
+		var rst = mxUtils.getPrettyXml(definitions);
+		rst = '<?xml version="1.0" encoding="UTF-8"?>\n' + rst;
+
+		return rst;
+	}
+
+	function decodeBpmn(bpmn_definitions) {
+
+		var doc = mxUtils.createXmlDocument();
+		var mxGraphModel = doc.createElement("mxGraphModel");
+
+		var bmpn_shape_map = {};
+		var node_style_map = {
+			"sequenceFlow" : "",
+			"startEvent" : "ellipse;",
+			"endEvent" : "ellipse;shape=endEvent;noHoverIcon=1;",
+			"userTask" : "shape=userTask;whiteSpace=wrap;",
+			"serviceTask" : "shape=serviceTask;whiteSpace=wrap;",
+			"userTask" : "shape=userTask;whiteSpace=wrap;",
+			"exclusiveGateway" : "rhombus;shape=exclusiveGateway;rounded=1;",
+			"parallelGateway" : "rhombus;shape=parallelGateway;rounded=1;",
+		}
+
+		var root = doc.createElement("root");
+		mxGraphModel.appendChild(root);
+
+		var bpmn_shapes = bpmn_definitions.getElementsByTagName("BPMNShape");
+		for (var i = 0; i < bpmn_shapes.length; i++){
+			bmpn_shape_map[bpmn_shapes[i].getAttribute("bpmnElement")] = bpmn_shapes[i];
+		}
+
+		var bpmn_process = bpmn_definitions.getElementsByTagName("process")[0];
+		var process_id = bpmn_process.getAttribute("id");
+		var process_name = bpmn_process.getAttribute("name");
+		var workflow = doc.createElement("Workflow");
+		workflow.setAttribute("name", process_id);
+		workflow.setAttribute("description", process_name);
+		workflow.setAttribute("id", 0);
+		var mxCell = doc.createElement("mxCell");
+		workflow.appendChild(mxCell);
+		root.appendChild(workflow);
+
+		var layer = doc.createElement("Layer");
+		layer.setAttribute("id", 1);
+		root.appendChild(layer);
+
+		var mxCell = doc.createElement("mxCell");
+		mxCell.setAttribute("parent", 0);
+		layer.appendChild(mxCell);
+
+		var process_children = bpmn_process.children;
+		for (var i = 0; i < process_children.length; i++) {
+			var process_node = process_children[i];
+			var name = process_node.getAttribute("name");
+			var id = process_node.getAttribute("id");
+
+			var node = doc.createElement(process_node.nodeName);
+			node.setAttribute("id", id);
+			
+			var mxCell = doc.createElement("mxCell");
+			mxCell.setAttribute("parent", 1);
+			var mxGeometry = doc.createElement("mxGeometry");
+			mxGeometry.setAttribute("as", "geometry");
+
+			var bpmn_shape = bmpn_shape_map[id];
+
+			// set mxCell attribute
+			if (node_style_map[process_node.nodeName]) {
+				mxCell.setAttribute("style", node_style_map[process_node.nodeName]);
+			}
+
+			if (process_node.nodeName == "sequenceFlow") {
+				var source = process_node.getAttribute("sourceRef");
+				var target = process_node.getAttribute("targetRef");
+				var style = bpmn_shape.getAttribute("style");
+
+				// create conditon expresstion
+				var conditionExpression = process_node.getElementsByTagName("conditionExpression");
+				if (conditionExpression.length > 0) {
+					var expr_cnt = conditionExpression[0].textContent;
+					var expr_el = doc.createElement("conditionExpression");
+					var cdata = doc.createCDATASection(expr_cnt);
+					expr_el.appendChild(cdata);
+
+					node.appendChild(expr_el);
+				}
+				
+				// set mxCell attribute
+				mxCell.setAttribute("source", source);
+				mxCell.setAttribute("target", target);
+				mxCell.setAttribute("edge", 1);
+				if (style) {
+					mxCell.setAttribute("style", style);
+				}
+				mxGeometry.setAttribute("relative", 1);
+				
+				// create mxPoints
+				var waypoints = bpmn_shape.getElementsByTagName("waypoint");
+				if (waypoints.length > 0) {
+					var mxArray = doc.createElement("Array");
+					mxArray.setAttribute("as", "points");
+					mxGeometry.appendChild(mxArray);
+
+					for (var wpi = 0; wpi < waypoints.length; wpi++) {
+						var mxPoint = doc.createElement("mxPoint");
+						mxPoint.setAttribute("x", waypoints[wpi].getAttribute("x"));
+						mxPoint.setAttribute("y", waypoints[wpi].getAttribute("y"));
+
+						mxArray.appendChild(mxPoint);
+					}
+				}
+
+			} else {
+				if (name) {
+					node.setAttribute("name", name);
+				}
+	
+				if (process_node.nodeName == "serviceTask" || process_node.nodeName == "userTask") {
+					var fromKey = process_node.getAttribute("fromKey");
+					node.setAttribute("fromKey", fromKey);
+				} 
+
+				var shape_child = bpmn_shape.firstElementChild;
+				if (shape_child && shape_child.nodeName == "Bounds") {
+					mxGeometry.setAttribute("x", shape_child.getAttribute("x"));
+					mxGeometry.setAttribute("y", shape_child.getAttribute("y"));
+					mxGeometry.setAttribute("height", shape_child.getAttribute("height"));
+					mxGeometry.setAttribute("width", shape_child.getAttribute("width"));
+				}
+
+				mxCell.setAttribute("vertex", 1);
+			}
+
+			mxCell.appendChild(mxGeometry);
+			node.appendChild(mxCell);
+
+			root.appendChild(node);
+		}
+
+		return mxGraphModel;
+	}
+
+	// Extends EditorUi to update I/O action states based on availability of backend
+	(function()
+	{
+		var editorUiInit = EditorUi.prototype.init;
+		
+		EditorUi.prototype.init = function()
+		{
+			editorUiInit.apply(this, arguments);
+
+			// Updates action states which require a backend
+			if (!Editor.useLocalStorage)
+			{
+				// mxUtils.post(OPEN_URL, '', mxUtils.bind(this, function(req)
+				// {
+				// 	var enabled = req.getStatus() != 404;
+				// 	this.actions.get('open').setEnabled(enabled || Graph.fileSupport);
+				// 	this.actions.get('import').setEnabled(enabled || Graph.fileSupport);
+				// 	this.actions.get('save').setEnabled(enabled);
+				// 	this.actions.get('saveAs').setEnabled(enabled);
+				// 	this.actions.get('export').setEnabled(enabled);
+				// }));
+			}
+
+			/**
+			 * Redirects start drag to parent.
+			 */
+			var graphHandlerGetInitialCellForEvent = mxGraphHandler.prototype.getInitialCellForEvent;
+			mxGraphHandler.prototype.getInitialCellForEvent = function(me)
+			{
+				
+				var cell = graphHandlerGetInitialCellForEvent.apply(this, arguments);
+				if (graph.isPart(cell))
+				{
+					cell = graph.getModel().getParent(cell)
+				}
+				
+				return cell;
+			};
+
+			/**
+			 *  the continue's sub-cell dbl click and select will redirect to parent
+			 */
+
+			var graph = this.editor.graph;
+
+			graph.getTooltipForCell = function(cell)
+			{
+				var tip = "";
+
+				if (cell.isEdge()) {
+					tip = '<b>' + cell.value.nodeName + '</b><br/>' +
+						'<b>Id:</b> ' + cell.getId() ;
+				} else if (cell.isVertex()) {
+					tip = '<b>' + cell.value.nodeName + '</b><br/>' +
+						'<b>Id:</b> ' + cell.getId() + '<br/>' +
+						'<b>Name:</b> '+ cell.getAttribute("name");
+				}
+
+				return tip;
+			}
+
+			// Helper method to mark parts with constituent=1 in the style
+			graph.isPart = function(cell)
+			{
+				let rst = this.getCurrentCellStyle(cell)['constituent'] == '1';
+				return rst;
+			};
+
+			graph.noHoverIcon = function(cell)
+			{
+				let rst = this.getCurrentCellStyle(cell)['noHoverIcon'] == '1';
+				return rst;
+			};
+
+			// Redirects selection to parent
+			graph.selectCellForEvent = function(cell, evt)
+			{
+				// let old_cell = cell;
+
+				if (this.isPart(cell))
+				{
+					cell = this.model.getParent(cell);
+				}
+				
+				// mxGraph.prototype.selectCellForEvent.apply(this, [cell, evt]);
+				mxGraph.prototype.selectCellForEvent.apply(this, arguments);
+			};
+
+			// Redirects dbl click to parent
+			var graphDblClick = graph.dblClick;
+			graph.dblClick = function(evt, cell)
+			{
+				if (this.isPart(cell))
+				{
+					cell = this.model.getParent(cell);
+				}
+				mxGraph.prototype.dblClick.apply(this, arguments);
+			};
+
+			graph.addListener(mxEvent.DOUBLE_CLICK, mxUtils.bind(this, function(graph, evt) {
+				if (evt.properties.cell != null) {
+					var action = this.actions.get("editData");
+					action.funct();
+					if (evt.preventDefault){
+						evt.preventDefault();
+					}
+				}
+				evt.consume();
+				return false;
+			}));
+			
+			HoverIcons.prototype.getState = function(state)
+			{
+				if (state != null)
+				{
+					var cell = state.cell;
+					
+					if (!this.graph.getModel().contains(cell))
+					{
+						state = null;
+					} else if (this.graph.isPart(cell) || this.graph.noHoverIcon(cell)) {
+						state = null;
+					} else {
+						// Uses connectable parent vertex if child is not connectable
+						if (this.graph.getModel().isVertex(cell) && !this.graph.isCellConnectable(cell))
+						{
+							var parent = this.graph.getModel().getParent(cell);
+							
+							if (this.graph.getModel().isVertex(parent) && this.graph.isCellConnectable(parent))
+							{
+								cell = parent;
+							}
+						}
+						
+						// Ignores locked cells and edges
+						if (this.graph.isCellLocked(cell) || this.graph.model.isEdge(cell))
+						{
+							cell = null;
+						}
+						
+						state = this.graph.view.getState(cell);
+						
+						if (state != null && state.style == null)
+						{
+							state = null;
+						}
+					}
+				}
+				
+				return state;
+			};
+
+
+			// 设置审批流中节点的验证规则 ========================
+			
+			// startEvent(out: 1..1) 
+			graph.multiplicities.push(new mxMultiplicity(
+				true, 'startEvent', null, null, 1, 1, ['userTask', 'serviceTask', 'parallelGateway', 'exclusiveGateway', 'endEvent'],
+				mxResources.get('startEvent_out_rule_tip1'),
+				mxResources.get('startEvent_out_rule_tip2')));
+
+			// startEvent(in: 0)
+			graph.multiplicities.push(new mxMultiplicity(
+				false, 'startEvent', null, null, 0, 0, null,
+				mxResources.get('startEvent_in_rule_tip1'),
+				null));
+
+			// userTask(out: 1..1)
+			graph.multiplicities.push(new mxMultiplicity(
+				true, 'userTask', null, null, 1, 1, ['userTask', 'serviceTask', 'parallelGateway', 'exclusiveGateway', 'endEvent'],
+				mxResources.get('userTask_out_rule_tip1'),
+				mxResources.get('userTask_out_rule_tip2')));
+
+			// userTask(in: 1..n)
+			graph.multiplicities.push(new mxMultiplicity(
+				false, 'userTask', null, null, 1, 'n', ['userTask', 'serviceTask', 'parallelGateway', 'exclusiveGateway', 'startEvent'],
+				mxResources.get('userTask_in_rule_tip1'),
+				mxResources.get('userTask_in_rule_tip2')));
+
+			// serviceTask(out: 1..1)
+			graph.multiplicities.push(new mxMultiplicity(
+				true, 'serviceTask', null, null, 1, 1, ['userTask', 'serviceTask', 'parallelGateway', 'exclusiveGateway', 'endEvent'],
+				mxResources.get('serviceTask_out_rule_tip1'),
+				mxResources.get('serviceTask_out_rule_tip2')));
+
+			// serviceTask(in: 1..n)
+			graph.multiplicities.push(new mxMultiplicity(
+				false, 'serviceTask', null, null, 1, 'n', ['userTask', 'serviceTask', 'parallelGateway', 'exclusiveGateway', 'startEvent'],
+				mxResources.get('serviceTask_in_rule_tip1'),
+				mxResources.get('serviceTask_in_rule_tip2')));
+
+			// exclusiveGateway(out: 1..n)
+			graph.multiplicities.push(new mxMultiplicity(
+				true, 'exclusiveGateway', null, null, 1, 'n', ['userTask', 'serviceTask', 'parallelGateway', 'exclusiveGateway', 'endEvent'],
+				mxResources.get('exclusiveGateway_out_rule_tip1'),
+				mxResources.get('exclusiveGateway_out_rule_tip2')));
+
+			// exclusiveGateway(in: 1..n)
+			graph.multiplicities.push(new mxMultiplicity(
+				false, 'exclusiveGateway', null, null, 1, 'n', ['userTask', 'serviceTask', 'parallelGateway', 'exclusiveGateway', 'startEvent'],
+				mxResources.get('exclusiveGateway_in_rule_tip1'),
+				mxResources.get('exclusiveGateway_in_rule_tip2')));
+
+			// parallelGateway(out: 1..n)
+			graph.multiplicities.push(new mxMultiplicity(
+				true, 'parallelGateway', null, null, 1, 'n', ['userTask', 'serviceTask', 'parallelGateway', 'exclusiveGateway', 'endEvent'],
+				mxResources.get('parallelGateway_out_rule_tip1'),
+				mxResources.get('parallelGateway_out_rule_tip2')));
+
+			// parallelGateway(in: 1..n)
+			graph.multiplicities.push(new mxMultiplicity(
+				false, 'parallelGateway', null, null, 1, 'n', ['userTask', 'serviceTask', 'parallelGateway', 'exclusiveGateway', 'startEvent'],
+				mxResources.get('parallelGateway_in_rule_tip1'),
+				mxResources.get('parallelGateway_in_rule_tip2')));
+
+			// endEvent(out: 0)
+			graph.multiplicities.push(new mxMultiplicity(
+				true, 'endEvent', null, null, 0, 0, null,
+				mxResources.get('endEvent_out_rule_tip1'),
+				null));
+
+			// endEvent(in: 1..n)
+			graph.multiplicities.push(new mxMultiplicity(
+				false, 'endEvent', null, null, 1, 'n', ['userTask', 'serviceTask', 'parallelGateway', 'exclusiveGateway', 'startEvent'],
+				mxResources.get('endEvent_in_rule_tip1'),
+				mxResources.get('endEvent_in_rule_tip2')));
+
+			// Installs automatic validation (use editor.validation = true
+			// if you are using an mxEditor instance)
+			graph.getModel().addListener(mxEvent.CHANGE, function (sender, evt) {
+				graph.validateGraph();
+			});
+
+		};
+
+		// Adds required resources (disables loading of fallback properties, this can only
+		// be used if we know that all keys are defined in the language specific file)
+		mxResources.loadDefaultBundle = false;
+		var bundle = mxResources.getDefaultBundle(RESOURCE_BASE, mxLanguage) ||
+			mxResources.getSpecialBundle(RESOURCE_BASE, mxLanguage);
+
+		// Fixes possible asynchronous requests
+		mxUtils.getAll([bundle, STYLE_PATH + '/default.xml'], function(xhr)
+		{
+			// Adds bundle text to resources
+			mxResources.parse(xhr[0].getText());
+			
+			// Configures the default graph theme
+			var themes = new Object();
+			themes[Graph.prototype.defaultThemeName] = xhr[1].getDocumentElement(); 
+
+			// Main
+			new EditorUi(new Editor(urlParams['chrome'] == '0', themes));
+		}, function()
+		{
+			document.body.innerHTML = '<center style="margin-top:10%;">Error loading resource files. Please check browser console.</center>';
+		});
+	})();
+</script>
+</body>
+</html>

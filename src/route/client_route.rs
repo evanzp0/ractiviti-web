@@ -1,6 +1,6 @@
 use axum::{Router, routing::get};
 
-use crate::handles::home;
+use crate::handles::{home, bpmn};
 
 
 pub fn client_route() -> Router {
@@ -10,7 +10,8 @@ pub fn client_route() -> Router {
         .route("/process_manage", get(home))
         .route("/user_manager", get(home))
         .route("/change_password", get(home))
-        .route("/logout", get(home));
+        .route("/logout", get(home))
+        .route("/bpmn", get(bpmn));
         
     routes
 }

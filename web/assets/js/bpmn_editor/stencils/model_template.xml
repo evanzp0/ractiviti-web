@@ -1,0 +1,10 @@
+<mxGraph>
+	<mxGraphModel as="model">
+		<root>
+			<Workflow id="0" name="" description=""  terminate_on_false="approval_pass"/>
+			<Layer>
+				<mxCell parent="0"/>
+			</Layer>
+		</root>
+	</mxGraphModel>
+</mxGraph>
