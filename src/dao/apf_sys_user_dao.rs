@@ -4,7 +4,7 @@ use tokio_pg_mapper::FromTokioPostgresRow;
 use tokio_postgres::Transaction;
 use color_eyre::Result;
 
-use crate::model::{ApfSysUser, ApfSysUserDto};
+use crate::model::{ApfSysUser, UpdateApfSysUser};
 
 pub struct ApfSysUserDao<'a> {
     base_dao: BaseDao<'a>
@@ -49,7 +49,7 @@ impl<'a> ApfSysUserDao<'a> {
         Ok(rst)
     }
 
-    pub async fn update(&self, user_dto: &ApfSysUserDto) -> Result<u64> {
+    pub async fn update(&self, user_dto: &UpdateApfSysUser) -> Result<u64> {
         let tran = self.tran();
         let rst = execute!(|user_dto, tran| {
             "UPDATE apf_sys_user

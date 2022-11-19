@@ -1,7 +1,7 @@
 use ractiviti_core::common::{db, md5, LocalTimeStamp};
 use color_eyre::Result;
 
-use crate::{dao::ApfSysUserDao, model::{ApfSysUser, ApfSysUserDto}};
+use crate::{dao::ApfSysUserDao, model::{ApfSysUser, UpdateApfSysUser}};
 
 
 pub struct SysUserService;
@@ -29,14 +29,14 @@ impl SysUserService {
         let tran = conn.transaction().await?;
 
         let sysuser_dao = ApfSysUserDao::new(&tran);
-        let user_dto = ApfSysUserDto {
+        let update_user = UpdateApfSysUser {
             id: Some(user_id.to_owned()),
             password: Some(password.to_owned()),
             update_time: Some(LocalTimeStamp::now().timestamp()),
             ..Default::default()
         };
 
-        sysuser_dao.update(&user_dto).await?;
+        sysuser_dao.update(&update_user).await?;
         tran.commit().await?;
 
         Ok(())
