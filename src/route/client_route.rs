@@ -19,7 +19,7 @@ pub fn nav_route() -> Router {
 pub fn bpmn_route() -> Router {
     let authed_routes = Router::new()
         .route("/new", get(new_bpmn).post(create_bpmn))
-        .route("/{proc_def_id}", get(get_bpmn).post(update_bpmn).delete(delete_bpmn))
+        .route("/:proc_def_id", get(get_bpmn).post(update_bpmn).delete(delete_bpmn))
         .layer(AuthLayer::new());
 
     let routes = Router::new().nest("/bpmn", authed_routes);

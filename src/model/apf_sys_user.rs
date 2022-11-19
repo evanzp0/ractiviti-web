@@ -9,7 +9,6 @@ pub struct ApfSysUser {
     pub id: String,
     pub name: String,
     pub nick_name: String,
-    pub password: String,
     pub company_id: String,
     pub create_time: i64,
     pub update_time: Option<i64>,
