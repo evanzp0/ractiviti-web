@@ -21,7 +21,7 @@ Editor = function(chromeless, themes, model, graph, editable)
 
 	this.getOrCreateFilename = function()
 	{
-		return this.filename || mxResources.get('drawing', [Editor.pageCounter]) + '.xml';
+		return this.filename || 'Untitled BPMN';
 	};
 	
 	this.getFilename = function()

@@ -4228,24 +4228,79 @@ EditorUi.prototype.saveFile = function(forceDialog)
 	}
 	else
 	{
-		var dlg = new FilenameDialog(this, this.editor.getOrCreateFilename(), mxResources.get('save'), mxUtils.bind(this, function(name)
-		{
-			this.save(name);
-		}), null, mxUtils.bind(this, function(name)
-		{
-			if (name != null && name.length > 0)
-			{
-				return true;
-			}
+		var dlg = new FilenameDialog(
+			this, 
+			this.editor.getOrCreateFilename(), 
+			mxResources.get('save'), 
+			mxUtils.bind(this, 
+				function(name) {
+					this.save(name);
+				}
+			), 
+			null, 
+			mxUtils.bind(
+				this, 
+				function(name) {
+					if (name != null && name.length > 0)
+					{
+						return true;
+					}
 			
-			mxUtils.confirm(mxResources.get('invalidName'));
+					mxUtils.confirm(mxResources.get('invalidName'));
 			
-			return false;
-		}));
+					return false;
+				}
+			),
+			null,
+			null,
+			false
+		);
 		this.showDialog(dlg.container, 300, 100, true, true);
 		dlg.init();
 	}
 };
+
+EditorUi.prototype.saveBpmn = function()
+{
+	// 如果是编辑BPMN则不使用对话框
+	if (this.editor.filename != null)
+	{
+		this.save(this.editor.getOrCreateFilename());
+	}
+	else
+	{
+		var dlg = new FilenameDialog(
+			this, 
+			'', 
+			mxResources.get('save'), 
+			mxUtils.bind(this, 
+				function(name) {
+					this.save(name);
+				}
+			), 
+			mxResources.get('bpmn_name'), 
+			mxUtils.bind(
+				this, 
+				function(name) {
+					if (name != null && name.length > 0)
+					{
+						return true;
+					}
+			
+					mxUtils.confirm(mxResources.get('invalidName'));
+			
+					return false;
+				}
+			),
+			null,
+			null,
+			false
+		);
+		this.showDialog(dlg.container, 300, 100, true, true);
+		dlg.init();
+	}
+};
+
 
 /**
  * Saves the current graph under the given filename.
@@ -4259,45 +4314,36 @@ EditorUi.prototype.save = function(name)
 			this.editor.graph.stopEditing();
 		}
 		
-		var xml = mxUtils.getXml(this.editor.getGraphXml());
+		// var xml = mxUtils.getXml(this.editor.getGraphXml());
+		var model = this.editor.graph.model;
+		var xml = encodeBpmn(model);
+		// var xml_enc = encodeURIComponent(encodeBpmn(model));
 		
-		try
-		{
-			if (Editor.useLocalStorage)
-			{
-				if (localStorage.getItem(name) != null &&
-					!mxUtils.confirm(mxResources.get('replaceIt', [name])))
-				{
-					return;
-				}
+		if (xml.length > MAX_REQUEST_SIZE) {
+			mxUtils.alert(mxResources.get('drawingTooLarge'));
+			mxUtils.popup(xml);
+			
+			return;
+		}
 
-				localStorage.setItem(name, xml);
-				this.editor.setStatus(mxUtils.htmlEntities(mxResources.get('saved')) + ' ' + new Date());
+		let _this = this;
+		axios.post('/bpmn/new', {
+				bpmn_name: name,
+				bpmn_xml: xml
 			}
-			else
-			{
-				if (xml.length < MAX_REQUEST_SIZE)
-				{
-					new mxXmlRequest(SAVE_URL, 'filename=' + encodeURIComponent(name) +
-						'&xml=' + encodeURIComponent(xml)).simulate(document, '_blank');
-				}
-				else
-				{
-					mxUtils.alert(mxResources.get('drawingTooLarge'));
-					mxUtils.popup(xml);
-					
-					return;
+		)
+		.then(function (response) {
+				let data = response.data;
+				if (data.is_ok) {
+					_this.editor.setModified(false);
+					_this.editor.setFilename(name);
+					_this.updateDocumentTitle();
+					_this.hideDialog(null, true);
+				} else {
+					alert(data.error);
 				}
 			}
-
-			this.editor.setModified(false);
-			this.editor.setFilename(name);
-			this.updateDocumentTitle();
-		}
-		catch (e)
-		{
-			this.editor.setStatus(mxUtils.htmlEntities(mxResources.get('errorSavingFile')));
-		}
+		);
 	}
 };
 

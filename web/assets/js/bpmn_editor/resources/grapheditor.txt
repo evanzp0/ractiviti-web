@@ -350,3 +350,4 @@ parallelGateway_in_rule_tip2=parallelGateway should be connected by [userTask | 
 endEvent_out_rule_tip1=endEvent should have 0 out-flow
 endEvent_in_rule_tip1=endEvent have at least 1 in-flow
 endEvent_in_rule_tip2=endEvent should be connected by [userTask | serviceTask | parallelGateway | exclusiveGateway | startEvent]
+bpmn_name=Process name
