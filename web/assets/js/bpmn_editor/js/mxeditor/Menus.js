@@ -95,7 +95,7 @@ Menus.prototype.init = function()
 
 	this.put('file', new Menu(mxUtils.bind(this, function(menu, parent)
 	{
-		this.addMenuItems(menu, ['save', 'extras'], parent);
+		this.addMenuItems(menu, ['publish', 'extras'], parent);
 	})));
 
 	this.put('edit', new Menu(mxUtils.bind(this, function(menu, parent)

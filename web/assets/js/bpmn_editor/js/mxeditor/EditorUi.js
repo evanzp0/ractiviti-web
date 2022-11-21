@@ -4260,22 +4260,22 @@ EditorUi.prototype.saveFile = function(forceDialog)
 	}
 };
 
-EditorUi.prototype.saveBpmn = function()
+EditorUi.prototype.publishBpmn = function()
 {
 	// 如果是编辑BPMN则不使用对话框
 	if (this.editor.filename != null)
 	{
-		this.save(this.editor.getOrCreateFilename());
+		this.publish(this.editor.getOrCreateFilename());
 	}
 	else
 	{
 		var dlg = new FilenameDialog(
 			this, 
 			'', 
-			mxResources.get('save'), 
+			mxResources.get('publish'), 
 			mxUtils.bind(this, 
 				function(name) {
-					this.save(name);
+					this.publish(name);
 				}
 			), 
 			mxResources.get('bpmn_name'), 
@@ -4305,7 +4305,7 @@ EditorUi.prototype.saveBpmn = function()
 /**
  * Saves the current graph under the given filename.
  */
-EditorUi.prototype.save = function(name)
+EditorUi.prototype.publish = function(name)
 {
 	if (name != null)
 	{
@@ -4339,6 +4339,7 @@ EditorUi.prototype.save = function(name)
 					_this.editor.setFilename(name);
 					_this.updateDocumentTitle();
 					_this.hideDialog(null, true);
+					alert("流程发布成功");
 				} else {
 					alert(data.error);
 				}

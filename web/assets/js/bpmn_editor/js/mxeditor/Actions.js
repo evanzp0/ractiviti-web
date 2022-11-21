@@ -25,7 +25,7 @@ Actions.prototype.init = function()
 	};
 
 	// File actions
-	this.addAction('save', function() { ui.saveBpmn(); }, null, null, Editor.ctrlKey + '+S').isEnabled = isGraphEnabled;
+	this.addAction('publish', function() { ui.publishBpmn(); }, null, null, null).isEnabled = isGraphEnabled;
 	this.addAction('extras', function()
 	{
 		var dlg = new EditDiagramDialog(ui);
