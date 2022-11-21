@@ -3,10 +3,10 @@ use serde::Serialize;
 
 
 #[derive(Serialize, Default)]
-pub struct FormInputResult<'a, T: Serialize> {
+pub struct FormInputResult<T: Serialize> {
     pub is_ok: bool,
     pub err_code: Option<ErrorCode>,
-    pub err_field: Option<&'a str>,
-    pub error: Option<&'a str>,
+    pub err_field: Option<String>,
+    pub error: Option<String>,
     pub data: Option<T>
 }

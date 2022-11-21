@@ -18,8 +18,8 @@ pub async fn change_password(Json(payload): Json<PasswordData>, session_facade: 
         let password_result = FormInputResult::<()> {
             is_ok: false,
             err_code: Some(ErrorCode::InvalidInput),
-            err_field: Some("password"),
-            error: Some("密码不正确"),
+            err_field: Some("password".to_owned()),
+            error: Some("密码不正确".to_owned()),
             ..Default::default()
         };
 
@@ -43,8 +43,8 @@ pub async fn change_password(Json(payload): Json<PasswordData>, session_facade: 
         let password_result = FormInputResult::<()> {
             is_ok: false,
             err_code: Some(ErrorCode::InvalidInput),
-            err_field: Some(err_field),
-            error: Some(&error),
+            err_field: Some(err_field.to_owned()),
+            error: Some(error.to_owned()),
             ..Default::default()
         };
 
@@ -58,7 +58,7 @@ pub async fn change_password(Json(payload): Json<PasswordData>, session_facade: 
     let password_result = FormInputResult::<()> {
         is_ok: true,
         err_code: Some(ErrorCode::InvalidInput),
-        err_field: Some("None"),
+        err_field: None,
         error: None,
         ..Default::default()
     };

@@ -1,6 +1,6 @@
 use axum::{response::IntoResponse, extract::Path, Json};
 use hyper::StatusCode;
-use ractiviti_core::{error::ErrorCode, service::engine::RepositoryService};
+use ractiviti_core::{error::{ErrorCode, AppError}, service::engine::RepositoryService};
 use serde::{Deserialize, Serialize};
 use validator::Validate;
 
@@ -37,8 +37,8 @@ pub async fn create_bpmn(Json(mut bpmn_dto): Json<BpmnDto>, session_facade: Sess
         let create_bpmn_result = FormInputResult::<()> {
             is_ok: false,
             err_code: Some(ErrorCode::InvalidInput),
-            err_field: Some(err_field),
-            error: Some(&error),
+            err_field: Some(err_field.to_owned()),
+            error: Some(error.to_owned()),
             ..Default::default()
         };
 
@@ -49,7 +49,28 @@ pub async fn create_bpmn(Json(mut bpmn_dto): Json<BpmnDto>, session_facade: Sess
     let company_id = session_facade.get_company_id().await.expect("Unexpected error");
 
     let repo_service = RepositoryService::new();
-    let procdef = repo_service.create_procdef(&bpmn_dto.bpmn_name, &company_id, &deployer_id, &bpmn_dto.bpmn_xml).await?;
+    let procdef_rst = repo_service.create_procdef(&bpmn_dto.bpmn_name, &company_id, &deployer_id, &bpmn_dto.bpmn_xml).await;
+    let procdef = match procdef_rst {
+        Ok(p_def) => p_def,
+        Err(error) => {
+            let err = error.downcast_ref::<AppError>();
+            let msg = if let Some(e) = err {
+                Some(e.msg.to_owned())
+            } else {
+                Some(ErrorCode::InternalError.default_message())
+            };
+
+            let create_bpmn_result = FormInputResult::<()> {
+                is_ok: false,
+                err_code: Some(ErrorCode::InvalidInput),
+                err_field: None,
+                error: msg,
+                ..Default::default()
+            };
+    
+            return Ok((StatusCode::OK, Json(create_bpmn_result)).into_response())
+        },
+    };
 
     let create_bpmn_result = FormInputResult::<BpmnResultDto> {
         is_ok: true,
