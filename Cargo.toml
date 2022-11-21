@@ -4,7 +4,8 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-axum-extra = "0.3.7"
+# axum-macros = "0.2"
+axum-extra = "0.3"
 async-trait = "0.1"
 rust-crypto = "0.2"
 rand = "0.8"

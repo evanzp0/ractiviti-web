@@ -1,12 +1,12 @@
 use axum::{response::IntoResponse, extract::Path, Json};
 use hyper::StatusCode;
-use ractiviti_core::{error::ErrorCode, service::engine::BpmnManager};
+use ractiviti_core::{error::ErrorCode, service::engine::RepositoryService};
 use serde::{Deserialize, Serialize};
 use validator::Validate;
 
 use crate::common::{template::HtmlTemplate, WebResult, dto::FormInputResult};
 
-use super::SessionFacade;
+use super::{SessionFacade, SessionFacadeInerface};
 
 pub async fn new_bpmn() -> WebResult<impl IntoResponse> {
     let tpl = HtmlTemplate::Path("./web/bpmn.html");
@@ -17,6 +17,7 @@ pub async fn new_bpmn() -> WebResult<impl IntoResponse> {
     Ok((StatusCode::OK, rst))
 }
 
+// #[debug_handler]
 pub async fn create_bpmn(Json(mut bpmn_dto): Json<BpmnDto>, session_facade: SessionFacade) -> WebResult<impl IntoResponse> {
     bpmn_dto.bpmn_name =  bpmn_dto.bpmn_name.trim().to_owned();
     bpmn_dto.bpmn_xml =  bpmn_dto.bpmn_xml.trim().to_owned();
@@ -41,12 +42,14 @@ pub async fn create_bpmn(Json(mut bpmn_dto): Json<BpmnDto>, session_facade: Sess
             ..Default::default()
         };
 
-        return Ok(Json(create_bpmn_result).into_response());
+        return Ok((StatusCode::OK, Json(create_bpmn_result)).into_response())
     }
 
-    let bpmn_mgr = BpmnManager::new();
-    // println!("{:?}", bpmn_dto.bpmn_xml);
-    println!("{:?}", bpmn_mgr.parse(bpmn_dto.bpmn_xml));
+    let deployer_id = session_facade.get_user_id().await.expect("Unexpected error");
+    let company_id = session_facade.get_company_id().await.expect("Unexpected error");
+
+    let repo_service = RepositoryService::new();
+    let procdef = repo_service.create_procdef(&bpmn_dto.bpmn_name, &company_id, &deployer_id, &bpmn_dto.bpmn_xml).await?;
 
     let create_bpmn_result = FormInputResult::<BpmnResultDto> {
         is_ok: true,
@@ -54,11 +57,12 @@ pub async fn create_bpmn(Json(mut bpmn_dto): Json<BpmnDto>, session_facade: Sess
         err_field: None,
         error: None,
         data: Some(BpmnResultDto {
-            bpmn_id: "11111".to_string(),
-            bpmn_name: bpmn_dto.bpmn_name.to_string(),
+            bpmn_id: procdef.id,
+            bpmn_name: procdef.name,
         }),
     };
-    Ok(Json(create_bpmn_result).into_response().into_response())
+
+    Ok((StatusCode::OK, Json(create_bpmn_result)).into_response())
 }
 
 pub async fn get_bpmn(Path(proc_def_id): Path<String>) -> WebResult<impl IntoResponse> {

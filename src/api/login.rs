@@ -22,7 +22,7 @@ pub async fn login(Json(payload): Json<LoginData>, mut session_facade: SessionFa
             };
             session_facade.set_user_id(sys_user.id.clone()).await;
             session_facade.set_user_name(sys_user.name.clone()).await;
-            session_facade.set_user_name(sys_user.company_id.clone()).await;
+            session_facade.set_company_id(sys_user.company_id.clone()).await;
             
             Ok(Json(login_result).into_response())
         },
