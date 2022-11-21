@@ -11,6 +11,7 @@ use axum::http::{HeaderValue, HeaderMap};
 use serde::Serialize;
 use serde_json::json;
 use log4rs_macros::error;
+use int_enum::IntEnum;
 
 #[derive(Debug)]
 pub enum WebError {
@@ -59,10 +60,14 @@ impl IntoResponse for WebError {
                 _ => {
                     let trace_no = gen_random_str(16);
                     error!("trace_no: {}, {:?}", trace_no, ae.to_string());
-                    let mut error_code = StatusCode::INTERNAL_SERVER_ERROR;
-                    if ae.code == ErrorCode::NotAuthorized {
-                        error_code = StatusCode::UNAUTHORIZED;
-                    }
+
+                    let error_code = match ae.code.int_value() / 100 {
+                        401 => StatusCode::UNAUTHORIZED,
+                        404 => StatusCode::NOT_FOUND,
+                        501 => StatusCode::NOT_IMPLEMENTED,
+                        _=> StatusCode::INTERNAL_SERVER_ERROR,
+                    };
+
                     err_with_trace_no(error_code, Some(&trace_no), Some(ErrBody::Html(&ae.msg)))
                 },
             }
@@ -82,7 +87,13 @@ impl From<AppError> for WebError {
 
 impl From<Report> for WebError {
     fn from(inner: Report) -> Self {
-        let ae = AppError::new(ErrorCode::InternalError, None, "", Some(Box::new(WrappedError(inner.to_string()))));
+        let err_str = inner.to_string();
+        let err = inner.downcast::<AppError>();
+        let ae = match err {
+            Ok(e) => e,
+            Err(_) => AppError::new(ErrorCode::InternalError, None, "", Some(Box::new(WrappedError(err_str))))
+        };
+        
         WebError::AppError(ae)
     }
 }
