@@ -18,7 +18,7 @@ axios.interceptors.response.use(
 );
 
 export default axios.create({
-    baseURL: "http://localhost:3000/service_api",
+    baseURL: "http://localhost:3000/api",
     headers: {
         "Content-type": "application/json"
     }

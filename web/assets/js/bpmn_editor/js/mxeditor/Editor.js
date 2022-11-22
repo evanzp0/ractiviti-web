@@ -648,6 +648,11 @@ Editor.prototype.setFilename = function(value)
 	this.filename = value;
 };
 
+Editor.prototype.setBpmnId = function(value)
+{
+	this.bpmnId = value;
+};
+
 /**
  * Creates and returns a new undo manager.
  */

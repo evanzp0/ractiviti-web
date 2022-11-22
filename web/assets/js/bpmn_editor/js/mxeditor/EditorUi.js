@@ -4327,7 +4327,16 @@ EditorUi.prototype.publish = function(name)
 		}
 
 		let _this = this;
-		axios.post('/bpmn/new', {
+		let reqPath = bpmnApiPath;
+		let pbmn_id = window.bpmnId || this.editor.bpmnId;
+
+		if (pbmn_id) {
+			// update bpmn url
+			reqPath += pbmn_id;
+		}
+
+		// create or update bpmn
+		axios.post(reqPath, {
 				bpmn_name: name,
 				bpmn_xml: xml
 			}
@@ -4335,13 +4344,16 @@ EditorUi.prototype.publish = function(name)
 		.then(function (response) {
 				let data = response.data;
 				_this.editor.setModified(false);
-				_this.editor.setFilename(name);
+				_this.editor.setFilename(data.bpmn_name);
+				_this.editor.setBpmnId(data.bpmn_id);
 				_this.updateDocumentTitle();
+
+				history.pushState('', '', '/bpmn/' + data.bpmn_id + '/edit');
+
 				_this.hideDialog(null, true);
 				alert("流程发布成功");
 			}
 		).catch(function(e) {
-
 			alert(e.response.data.error)
 		});
 	}

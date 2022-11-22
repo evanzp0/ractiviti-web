@@ -1,14 +1,13 @@
-
 export enum ErrorCode {
+    InvalidInput = 40001,
+    NotSupportError = 40002,
+    ResourceExist = 40003,
+    SessionNotExist = 40004,
+    FileSizeError = 40005,
+    ParseError = 40006,
     InvalidCredentials = 40101,
     NotAuthorized = 40102,
     NotFound = 40401,
     InternalError = 50001,
     UnexpectedError = 50002,
-    InvalidInput = 50101,
-    NotSupportError = 50102,
-    ResourceExist = 50103,
-    SessionNotExist = 50104,
-    FileSizeError = 50105,
-    ParseError = 50106,
 }

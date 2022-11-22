@@ -35,10 +35,23 @@
 			return result;
 		})(window.location.href);
 	
+		var pbmnId = (function(url){
+			const re = new RegExp('/bpmn/(\\w+)/edit', 'i');
+			var rst = url.match(re);
+			if (rst) {
+				return rst[1];
+			} else {
+				return null;
+			}
+		})(window.location.href);
+
+		window.pbmnId = pbmnId;
+
 		// Default resources are included in grapheditor resources
 		mxLoadResources = false;
 		mxBasePath = "/assets/js/mxgraph/";
-		bpmnEditorBasePath = "/assets/js/bpmn_editor/"
+		bpmnEditorBasePath = "/assets/js/bpmn_editor/";
+		bpmnApiPath = "/api/bpmn/";
 	</script>
 	<script type="text/javascript" src="/assets/js/axios.min.js"></script>
 	<script type="text/javascript" src="/assets/js/bpmn_editor/js/mxeditor/Init.js"></script>

@@ -18,9 +18,9 @@ impl IntoResponse for WebError {
 
         let error_code = match http_code {
             // 业务交互性 error 不需要跟踪
+            400 => StatusCode::BAD_REQUEST,
             401 => StatusCode::UNAUTHORIZED,
             404 => StatusCode::NOT_FOUND,
-            501 => StatusCode::NOT_IMPLEMENTED,
             _=> {
                 let t_no = gen_random_str(16);
                 error!("trace_no: {}, {:?}", t_no, self.0.to_string());
