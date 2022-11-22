@@ -35,21 +35,17 @@ export const login = (loginData: ILoginData) => async (dispatch: AppThunkDispatc
     LoginService.login(loginData)
         .then((response: any) => {
             let rst = response as LoginResult;
-            if (rst.is_pass) {
-                if (remember) {
-                    localStorage.setItem("loginData", JSON.stringify(loginData));
-                } else {
-                    localStorage.removeItem("loginData");
-                }
-
-                dispatch(logined());
+            if (remember) {
+                localStorage.setItem("loginData", JSON.stringify(loginData));
             } else {
-                alert(rst.error);
+                localStorage.removeItem("loginData");
             }
+
+            dispatch(logined());
         })
-        .catch((e) => {
-            console.log(e);
-        })
+        // .catch((e) => {
+        //     console.log(e);
+        // })
 }
 
 // export function login(loginData: ILoginData) {

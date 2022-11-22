@@ -1,11 +1,12 @@
 use axum::{Json, response::IntoResponse};
 use ractiviti_core::{error::{ErrorCode, AppError}, common::md5};
 use serde::Deserialize;
+use serde_json::json;
 use validator::Validate;
 
-use crate::{handles::{SessionFacade, SessionFacadeInerface}, common::{WebResult, dto::FormInputResult}, service::SysUserService};
+use crate::{handles::{SessionFacade, SessionFacadeInerface}, service::SysUserService, common::ApiResult};
 
-pub async fn change_password(Json(payload): Json<PasswordData>, session_facade: SessionFacade) -> WebResult<impl IntoResponse> {
+pub async fn change_password(Json(payload): Json<PasswordData>, session_facade: SessionFacade) -> ApiResult<impl IntoResponse> {
     let user_service = SysUserService::new();
     let user_name = session_facade.get_user_name().await;
     let user_name = match user_name {
@@ -15,15 +16,7 @@ pub async fn change_password(Json(payload): Json<PasswordData>, session_facade: 
     
     let verify_rst = user_service.verify_sysuser(&user_name, &payload.password).await;
     if let Err(_) = verify_rst {
-        let password_result = FormInputResult::<()> {
-            is_ok: false,
-            err_code: Some(ErrorCode::InvalidInput),
-            err_field: Some("password".to_owned()),
-            error: Some("密码不正确".to_owned()),
-            ..Default::default()
-        };
-
-       return Ok(Json(password_result).into_response())
+        Err(AppError::new_for_input_err(Some("密码不正确"), "password"))?
     }
 
     // 修改密码
@@ -39,29 +32,15 @@ pub async fn change_password(Json(payload): Json<PasswordData>, session_facade: 
             }
             break;
         }
-        
-        let password_result = FormInputResult::<()> {
-            is_ok: false,
-            err_code: Some(ErrorCode::InvalidInput),
-            err_field: Some(err_field.to_owned()),
-            error: Some(error.to_owned()),
-            ..Default::default()
-        };
 
-        return Ok(Json(password_result).into_response());
+        Err(AppError::new_for_input_err(Some(&error), err_field))?
     }
 
     let user_id = session_facade.get_user_id().await.unwrap();
     let new_password = md5(payload.new_password);
     user_service.change_password(&user_id, &new_password).await?;
 
-    let password_result = FormInputResult::<()> {
-        is_ok: true,
-        err_code: Some(ErrorCode::InvalidInput),
-        err_field: None,
-        error: None,
-        ..Default::default()
-    };
+    let password_result = json!({"is_ok": true,});
 
     Ok(Json(password_result).into_response())
 }

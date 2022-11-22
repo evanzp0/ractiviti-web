@@ -4,7 +4,7 @@ use ractiviti_core::{error::{ErrorCode, AppError}, service::engine::RepositorySe
 use serde::{Deserialize, Serialize};
 use validator::Validate;
 
-use crate::common::{template::HtmlTemplate, WebResult, dto::FormInputResult};
+use crate::common::{template::HtmlTemplate, WebResult, ApiResult};
 
 use super::{SessionFacade, SessionFacadeInerface};
 
@@ -18,7 +18,7 @@ pub async fn new_bpmn() -> WebResult<impl IntoResponse> {
 }
 
 // #[debug_handler]
-pub async fn create_bpmn(Json(mut bpmn_dto): Json<BpmnDto>, session_facade: SessionFacade) -> WebResult<impl IntoResponse> {
+pub async fn create_bpmn(Json(mut bpmn_dto): Json<BpmnDto>, session_facade: SessionFacade) -> ApiResult<impl IntoResponse> {
     bpmn_dto.bpmn_name =  bpmn_dto.bpmn_name.trim().to_owned();
     bpmn_dto.bpmn_xml =  bpmn_dto.bpmn_xml.trim().to_owned();
 
@@ -33,16 +33,8 @@ pub async fn create_bpmn(Json(mut bpmn_dto): Json<BpmnDto>, session_facade: Sess
             }
             break;
         }
-        
-        let create_bpmn_result = FormInputResult::<()> {
-            is_ok: false,
-            err_code: Some(ErrorCode::InvalidInput),
-            err_field: Some(err_field.to_owned()),
-            error: Some(error.to_owned()),
-            ..Default::default()
-        };
 
-        return Ok((StatusCode::OK, Json(create_bpmn_result)).into_response())
+        Err(AppError::new_for_input_err(Some(&error), err_field))?
     }
 
     let deployer_id = session_facade.get_user_id().await.expect("Unexpected error");
@@ -55,32 +47,18 @@ pub async fn create_bpmn(Json(mut bpmn_dto): Json<BpmnDto>, session_facade: Sess
         Err(error) => {
             let err = error.downcast_ref::<AppError>();
             let msg = if let Some(e) = err {
-                Some(e.msg.to_owned())
+                e.msg.to_owned()
             } else {
-                Some(ErrorCode::InternalError.default_message())
-            };
-
-            let create_bpmn_result = FormInputResult::<()> {
-                is_ok: false,
-                err_code: Some(ErrorCode::InvalidInput),
-                err_field: None,
-                error: msg,
-                ..Default::default()
+                ErrorCode::InternalError.default_message()
             };
     
-            return Ok((StatusCode::OK, Json(create_bpmn_result)).into_response())
+            Err(AppError::new_for_input_err(Some(&msg), "bpmn_name"))?
         },
     };
 
-    let create_bpmn_result = FormInputResult::<BpmnResultDto> {
-        is_ok: true,
-        err_code: None,
-        err_field: None,
-        error: None,
-        data: Some(BpmnResultDto {
-            bpmn_id: procdef.id,
-            bpmn_name: procdef.name,
-        }),
+    let create_bpmn_result = BpmnResultDto {
+        bpmn_id: procdef.id,
+        bpmn_name: procdef.name,
     };
 
     Ok((StatusCode::OK, Json(create_bpmn_result)).into_response())

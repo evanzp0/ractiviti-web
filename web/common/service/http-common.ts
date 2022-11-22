@@ -6,25 +6,14 @@ axiosInherit(axios);
 // Add a response interceptor
 axios.interceptors.response.use(
     function (response) {
-        // if (response.data && response.data.error) {
-        //     alert(response.data.error);
-        //     throw response.data;
-        // }
-
         return response.data;
-    }
-    , function (e) {
-        if (e.response.data && e.response.data.error) {
-            alert(e.response.data.error);
-        } else if (e.response.data) {
-            alert(e.response.data);
-        } else {
-            alert(e);
-        }
+    }, 
+    function (e) {
+        console.log(e.response.data);
+        
+        alert(e.response.data.error);
 
-        // console.log(e);
-
-        return Promise.reject(e);
+        return Promise.reject(e.response.data);
     }
 );
 

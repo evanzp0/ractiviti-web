@@ -4334,17 +4334,16 @@ EditorUi.prototype.publish = function(name)
 		)
 		.then(function (response) {
 				let data = response.data;
-				if (data.is_ok) {
-					_this.editor.setModified(false);
-					_this.editor.setFilename(name);
-					_this.updateDocumentTitle();
-					_this.hideDialog(null, true);
-					alert("流程发布成功");
-				} else {
-					alert(data.error);
-				}
+				_this.editor.setModified(false);
+				_this.editor.setFilename(name);
+				_this.updateDocumentTitle();
+				_this.hideDialog(null, true);
+				alert("流程发布成功");
 			}
-		);
+		).catch(function(e) {
+
+			alert(e.response.data.error)
+		});
 	}
 };
 

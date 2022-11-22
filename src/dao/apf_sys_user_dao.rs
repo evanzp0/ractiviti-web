@@ -36,7 +36,7 @@ impl<'a> ApfSysUserDao<'a> {
         if rows.len() == 0 {
             Err(
                 AppError::new(
-                    ErrorCode::NotFound, 
+                    ErrorCode::NotSupportError, 
                     Some(&format!("apf_sys_user(name:{} is not exist", name)), 
                     concat!(file!(), ":", line!()), 
                     None

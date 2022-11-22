@@ -6,7 +6,5 @@ export default interface ILoginData {
 
 export interface LoginResult {
     user_name: string,
-    error: string | undefined,
-    err_code: number | undefined,
     is_pass: boolean,
 }

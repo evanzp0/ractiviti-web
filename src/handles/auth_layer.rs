@@ -2,13 +2,14 @@ use std::{task::{Poll, Context}};
 
 use futures::future::BoxFuture;
 use hyper::{Request, StatusCode};
+use ractiviti_core::error::ErrorCode;
 use tower::{Layer, Service};
 use axum::{response::{Response, IntoResponse}, body::BoxBody, Json};
 use axum_sessions::SessionHandle;
 // use axum::body::Body;
 // use axum::body::HttpBody;
 
-use crate::common::error::JsonErrorMsg;
+use crate::common::JsonError;
 
 use super::USER_ID_KEY;
 
@@ -76,7 +77,8 @@ where
                     
                     let msg = "当前用户尚未登录，请先登录";
                     if is_json_req {
-                        Ok((StatusCode::UNAUTHORIZED, Json(JsonErrorMsg{error: msg})).into_response())
+                        let json_err = JsonError::new(ErrorCode::UnAuthorized, msg.to_owned(), None);
+                        Ok((StatusCode::UNAUTHORIZED, Json(json_err)).into_response())
                     } else {
                         Ok((StatusCode::UNAUTHORIZED, msg).into_response())
                     }
