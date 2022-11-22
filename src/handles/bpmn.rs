@@ -14,7 +14,7 @@ pub async fn new_bpmn() -> WebResult<impl IntoResponse> {
         .render(&"")
         .await?;
 
-    Ok((StatusCode::OK, rst))
+    Ok(rst)
 }
 
 // #[debug_handler]
@@ -61,7 +61,7 @@ pub async fn create_bpmn(Json(mut bpmn_dto): Json<BpmnDto>, session_facade: Sess
         bpmn_name: procdef.name,
     };
 
-    Ok((StatusCode::OK, Json(create_bpmn_result)).into_response())
+    Ok(Json(create_bpmn_result))
 }
 
 pub async fn get_bpmn(Path(proc_def_id): Path<String>) -> WebResult<impl IntoResponse> {
