@@ -35,8 +35,8 @@
 			return result;
 		})(window.location.href);
 	
-		var pbmnId = (function(url){
-			const re = new RegExp('/bpmn/(\\w+)/edit', 'i');
+		var bpmnId = (function(url){
+			const re = new RegExp('/bpmn/([a-zA-z0-9\-]+)/edit', 'i');
 			var rst = url.match(re);
 			if (rst) {
 				return rst[1];
@@ -45,7 +45,7 @@
 			}
 		})(window.location.href);
 
-		window.pbmnId = pbmnId;
+		console.log("bpmnId = ", bpmnId);
 
 		// Default resources are included in grapheditor resources
 		mxLoadResources = false;
@@ -387,6 +387,35 @@
 		return mxGraphModel;
 	}
 
+	function loadBpmn(bpmnId, editorUi, graph) {
+		let reqPath = bpmnApiPath + bpmnId;
+		// create or update bpmn
+		axios.get(
+			reqPath, 
+			{ bpmn_id: bpmnId }
+		)
+		.then(
+			function (response) {
+				let data = response.data;
+				
+				editorUi.editor.setFilename(data.bpmn_name);
+				editorUi.editor.setBpmnId(data.bpmn_id);
+				editorUi.updateDocumentTitle();
+
+				var bpmnXml = mxUtils.parseXml(data.xml);
+				var model = graph.model;
+				var rst = decodeBpmn(bpmnXml);
+
+				var codec = new mxCodec(bpmnXml);
+				codec.decode(rst, model);
+
+				editorUi.editor.setModified(false);
+			}
+		).catch(function(e) {
+			console.log(e)
+		});
+	}
+
 	// Extends EditorUi to update I/O action states based on availability of backend
 	(function()
 	{
@@ -395,20 +424,6 @@
 		EditorUi.prototype.init = function()
 		{
 			editorUiInit.apply(this, arguments);
-
-			// Updates action states which require a backend
-			if (!Editor.useLocalStorage)
-			{
-				// mxUtils.post(OPEN_URL, '', mxUtils.bind(this, function(req)
-				// {
-				// 	var enabled = req.getStatus() != 404;
-				// 	this.actions.get('open').setEnabled(enabled || Graph.fileSupport);
-				// 	this.actions.get('import').setEnabled(enabled || Graph.fileSupport);
-				// 	this.actions.get('save').setEnabled(enabled);
-				// 	this.actions.get('saveAs').setEnabled(enabled);
-				// 	this.actions.get('export').setEnabled(enabled);
-				// }));
-			}
 
 			/**
 			 * Redirects start drag to parent.
@@ -620,6 +635,10 @@
 				graph.validateGraph();
 			});
 
+			if (bpmnId) {
+				loadBpmn(bpmnId, this, graph);
+			}
+			
 		};
 
 		// Adds required resources (disables loading of fallback properties, this can only
