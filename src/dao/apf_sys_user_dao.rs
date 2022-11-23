@@ -79,7 +79,9 @@ mod tests {
         let tran = conn.transaction().await.unwrap();
         let dao = ApfSysUserDao::new(&tran);
 
-        dao.get_by_name("admin", "21232f297a57a5a743894a0e4a801fc3").await.unwrap();
+        let rst = dao.get_by_name("admin", "21232f297a57a5a743894a0e4a801fc3").await.unwrap();
+        assert_eq!("admin", rst.name);
+        
         tran.rollback().await.unwrap();
     }
 }
