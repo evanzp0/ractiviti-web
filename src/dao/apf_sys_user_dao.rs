@@ -26,7 +26,7 @@ impl<'a> ApfSysUserDao<'a> {
 
     pub async fn get_by_name(&self, name: &str, password: &str) -> Result<ApfSysUser> {
         let sql = r#"
-            SELECT id, name, nick_name, company_id, create_time, update_time
+            SELECT id, name, nick_name, company_id, company_name, create_time, update_time
             FROM apf_sys_user 
             WHERE name = $1
                 AND password = $2
@@ -65,5 +65,21 @@ impl<'a> ApfSysUserDao<'a> {
         } else {
             Err(AppError::new(ErrorCode::InternalError, Some("User 更新失败"), concat!(file!(), ":", line!()), None))?
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use ractiviti_core::common::db;
+    use super::*;
+
+    #[tokio::test]
+    async fn test_get_by_name() {
+        let mut conn = db::get_connect().await.unwrap();
+        let tran = conn.transaction().await.unwrap();
+        let dao = ApfSysUserDao::new(&tran);
+
+        dao.get_by_name("admin", "21232f297a57a5a743894a0e4a801fc3").await.unwrap();
+        tran.rollback().await.unwrap();
     }
 }
