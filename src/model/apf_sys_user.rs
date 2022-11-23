@@ -10,6 +10,7 @@ pub struct ApfSysUser {
     pub name: String,
     pub nick_name: String,
     pub company_id: String,
+    pub company_name: String,
     pub create_time: i64,
     pub update_time: Option<i64>,
 }
@@ -21,6 +22,7 @@ pub struct UpdateApfSysUser {
     pub nick_name: Option<String>,
     pub password: Option<String>,
     pub company_id: Option<String>,
+    pub company_name: Option<String>,
     pub create_time: Option<i64>,
     pub update_time: Option<i64>,
 }
@@ -29,13 +31,7 @@ pub struct UpdateApfSysUser {
 impl UpdateApfSysUser {
     pub fn new() -> Self {
         Self {
-            id: None,
-            name: None,
-            nick_name: None,
-            password: None,
-            company_id: None,
-            create_time: None,
-            update_time: None,
+            ..Default::default()
         }
     }
 }
