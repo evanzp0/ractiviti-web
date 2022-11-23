@@ -68,7 +68,7 @@ export default function DeployManagement() {
             field: 'deploy_time',
             headerName: '发布时间',
             sortable: false,
-            width: 150,
+            width: 200,
             valueGetter: (params: GridValueGetterParams) =>
             `${utc_to_dt(params.row.deploy_time).toLocaleString('zh-CN')}`,
         },
@@ -103,6 +103,10 @@ export default function DeployManagement() {
         }
     };
 
+    const handleNewBpmn: () => void = () => {
+        window.open("/bpmn/new");
+    }
+
     return (
         <Box sx={{width: '100%'}}>
             <Toolbar>
@@ -110,7 +114,7 @@ export default function DeployManagement() {
                         发布日志
                 </Typography>
                 <Stack direction="row" spacing={0} ml={2}>
-                    <Button >新增流程</Button>
+                    <Button onClick={handleNewBpmn}>新增流程</Button>
                 </Stack>
             </Toolbar>
             <Box component="form" onSubmit={handleSubmit(handlePageQuery)} noValidate ml={2} mr={2} >

@@ -4329,13 +4329,11 @@ EditorUi.prototype.publish = function(name)
 		let _this = this;
 		let reqPath = bpmnApiPath;
 		let bpmnId = window.bpmnId || this.editor.bpmnId;
-		console.log("2.bpmnId = ", bpmnId);
 
 		if (bpmnId) {
 			// update bpmn url
 			reqPath += bpmnId;
 		}
-		console.log("2.bpmnId = ", bpmnId);
 
 		// create or update bpmn
 		axios.post(reqPath, {

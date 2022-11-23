@@ -7,7 +7,7 @@ use hyper::StatusCode;
 
 use crate::{
     api::{
-        bpmn::{create_bpmn, delete_bpmn, get_bpmn, update_bpmn},
+        bpmn::{publish_new_bpmn, delete_bpmn, get_bpmn, publish_bpmn_by_procdef},
         deployment::deployment_query,
         login::login,
         password::change_password,
@@ -26,10 +26,10 @@ pub fn api_route() -> Router {
         .layer(AuthLayer::new());
 
     let bpmn_routes = Router::new()
-        .route("/", post(create_bpmn))
+        .route("/", post(publish_new_bpmn))
         .route(
             "/:proc_def_id",
-            get(get_bpmn).post(update_bpmn).delete(delete_bpmn),
+            get(get_bpmn).post(publish_bpmn_by_procdef).delete(delete_bpmn),
         )
         .layer(AuthLayer::new());
     let bpmn_routes = Router::new().nest("/bpmn", bpmn_routes);

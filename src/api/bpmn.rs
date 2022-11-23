@@ -16,7 +16,7 @@ pub struct BpmnDto {
 }
 
 // #[debug_handler]
-pub async fn create_bpmn(Json(mut bpmn_dto): Json<BpmnDto>, session_facade: SessionFacade) -> ApiResult<impl IntoResponse> {
+pub async fn publish_new_bpmn(Json(mut bpmn_dto): Json<BpmnDto>, session_facade: SessionFacade) -> ApiResult<impl IntoResponse> {
     bpmn_dto.bpmn_name =  bpmn_dto.bpmn_name.trim().to_owned();
     bpmn_dto.bpmn_xml =  bpmn_dto.bpmn_xml.trim().to_owned();
 
@@ -35,13 +35,13 @@ pub async fn create_bpmn(Json(mut bpmn_dto): Json<BpmnDto>, session_facade: Sess
         Err(AppError::new_for_input_err(Some(&error), err_field))?
     }
 
-    let deployer_id = session_facade.get_user_id().await.expect("Unexpected error");
-    let company_id = session_facade.get_company_id().await.expect("Unexpected error");
-    let deployer_name = session_facade.get_user_name().await.expect("Unexpected error");
-    let company_name = session_facade.get_company_name().await.expect("Unexpected error");
+    let deployer_id = &session_facade.get_user_id().await.expect("Unexpected error");
+    let company_id = &session_facade.get_company_id().await.expect("Unexpected error");
+    let deployer_name = &session_facade.get_user_name().await.expect("Unexpected error");
+    let company_name = &session_facade.get_company_name().await.expect("Unexpected error");
 
     let repo_service = RepositoryService::new();
-    let procdef_rst = repo_service.create_procdef(&bpmn_dto.bpmn_name, &deployer_id, &deployer_name, &company_id, &company_name, &bpmn_dto.bpmn_xml).await;
+    let procdef_rst = repo_service.create_procdef(&bpmn_dto.bpmn_name, deployer_id, deployer_name, company_id, company_name, &bpmn_dto.bpmn_xml).await;
     let procdef = match procdef_rst {
         Ok(p_def) => p_def,
         Err(error) => {
@@ -56,24 +56,24 @@ pub async fn create_bpmn(Json(mut bpmn_dto): Json<BpmnDto>, session_facade: Sess
         },
     };
 
-    let create_bpmn_result = BpmnResultDto {
+    let bpmn_result = BpmnResultDto {
         bpmn_id: procdef.id,
         bpmn_key: procdef.key,
         bpmn_name: procdef.name,
         xml: None
     };
 
-    Ok(Json(create_bpmn_result))
+    Ok(Json(bpmn_result))
 }
 
 pub async fn get_bpmn(Path(procdef_id): Path<String>) -> ApiResult<impl IntoResponse> {
     let repo_service = RepositoryService::new();
-    let rst = repo_service.get_bpmn_by_procdef_id(procdef_id).await?;
+    let rst = repo_service.get_bpmn_by_procdef_id(&procdef_id).await?;
 
     Ok(Json(rst))
 }
 
-pub async fn update_bpmn(Path(procdef_id): Path<String>, Json(mut bpmn_dto): Json<BpmnDto>, session_facade: SessionFacade) -> ApiResult<impl IntoResponse> {
+pub async fn publish_bpmn_by_procdef(Path(procdef_id): Path<String>, Json(mut bpmn_dto): Json<BpmnDto>, session_facade: SessionFacade) -> ApiResult<impl IntoResponse> {
     bpmn_dto.bpmn_name =  bpmn_dto.bpmn_name.trim().to_owned();
     bpmn_dto.bpmn_xml =  bpmn_dto.bpmn_xml.trim().to_owned();
 
@@ -92,12 +92,22 @@ pub async fn update_bpmn(Path(procdef_id): Path<String>, Json(mut bpmn_dto): Jso
         Err(AppError::new_for_input_err(Some(&error), err_field))?
     }
 
-    let deployer_id = session_facade.get_user_id().await.expect("Unexpected error");
-    let company_id = session_facade.get_company_id().await.expect("Unexpected error");
+    let deployer_id = &session_facade.get_user_id().await.expect("Unexpected error");
+    let deployer_name = &session_facade.get_user_name().await.expect("Unexpected error");
 
-    // todo
-    
-    Ok(Json(json!({ "msg": format!("bpmn udpated: {}", procdef_id) })))
+    let repo_service = RepositoryService::new();
+    let procdef = repo_service.get_procdef_by_id(&procdef_id).await?;
+
+    let new_procdef = repo_service.publish_procdef(&procdef, deployer_id, deployer_name, &bpmn_dto.bpmn_xml).await?;
+
+    let bpmn_result = BpmnResultDto {
+        bpmn_id: new_procdef.id,
+        bpmn_key: new_procdef.key,
+        bpmn_name: new_procdef.name,
+        xml: None
+    };
+
+    Ok(Json(bpmn_result))
 }
 
 pub async fn delete_bpmn(Path(procdef_id): Path<String>) -> ApiResult<impl IntoResponse> {

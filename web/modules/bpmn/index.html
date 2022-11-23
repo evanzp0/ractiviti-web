@@ -45,8 +45,6 @@
 			}
 		})(window.location.href);
 
-		console.log("bpmnId = ", bpmnId);
-
 		// Default resources are included in grapheditor resources
 		mxLoadResources = false;
 		mxBasePath = "/assets/js/mxgraph/";
@@ -144,15 +142,15 @@
 		var process_id = root.getAttribute("name");
 		var process_name = root.getAttribute("description");
 		var process = doc.createElement("process");
-		process.setAttribute("id", process_id);
-		process.setAttribute("name", process_name);
+		process.setAttribute("id", "process");
+		process.setAttribute("name", "");
 
 		// BPMNDiagram
 		var BPMNDiagram = doc.createElement("BPMNDiagram");
-		BPMNDiagram.setAttribute("id", "BPMNDiagram_" + process_id);
+		BPMNDiagram.setAttribute("id", "BPMNDiagram");
 		var BPMNPlane = doc.createElement("BPMNPlane");
-		BPMNPlane.setAttribute("id", "BPMNPlane_" + process_id);
-		BPMNPlane.setAttribute("bpmnElement", process_id);
+		BPMNPlane.setAttribute("id", "BPMNPlane");
+		BPMNPlane.setAttribute("bpmnElement", "");
 		BPMNDiagram.appendChild(BPMNPlane);
 
 		definitions.appendChild(process);
@@ -179,11 +177,11 @@
 
 			if (is_vertex) {
 				var name = children[i].getAttribute("name");
-				node.setAttribute("name", name);
+				node.setAttribute("name", name || "");
 
-				if (node_name == "serviceTask") {
+				if (node_name == "serviceTask" || node_name == "userTask") {
 					var from_key = children[i].getAttribute("fromKey");
-					node.setAttribute("fromKey", from_key);
+					node.setAttribute("fromKey", from_key || "");
 				}
 
 				var bounds = doc.createElement("Bounds");
@@ -261,7 +259,6 @@
 			"sequenceFlow" : "",
 			"startEvent" : "ellipse;",
 			"endEvent" : "ellipse;shape=endEvent;noHoverIcon=1;",
-			"userTask" : "shape=userTask;whiteSpace=wrap;",
 			"serviceTask" : "shape=serviceTask;whiteSpace=wrap;",
 			"userTask" : "shape=userTask;whiteSpace=wrap;",
 			"exclusiveGateway" : "rhombus;shape=exclusiveGateway;rounded=1;",
@@ -358,13 +355,11 @@
 				}
 
 			} else {
-				if (name) {
-					node.setAttribute("name", name);
-				}
+				node.setAttribute("name", name || "");
 	
 				if (process_node.nodeName == "serviceTask" || process_node.nodeName == "userTask") {
 					var fromKey = process_node.getAttribute("fromKey");
-					node.setAttribute("fromKey", fromKey);
+					node.setAttribute("fromKey", fromKey || "");
 				} 
 
 				var shape_child = bpmn_shape.firstElementChild;
