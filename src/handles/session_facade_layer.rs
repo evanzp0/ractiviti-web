@@ -11,6 +11,7 @@ use super::SessionHandle;
 pub const USER_ID_KEY: &str = "user_id";
 pub const USER_NAME_KEY: &str = "user_name";
 pub const COMPANY_ID_KEY: &str = "company_id";
+pub const COMPANY_NAME_KEY: &str = "company_name";
 pub type SessionFacade = MemorySessionFacade;
 
 #[async_trait]
@@ -21,6 +22,8 @@ pub trait SessionFacadeInerface {
     async fn set_user_name(&mut self, user_id: String);
     async fn get_company_id(&self) -> Option<String>;
     async fn set_company_id(&mut self, company_id: String);
+    async fn get_company_name(&self) -> Option<String>;
+    async fn set_company_name(&mut self, company_id: String);
     async fn is_login(&self) -> bool;
 }
 
@@ -134,6 +137,16 @@ impl SessionFacadeInerface for MemorySessionFacade {
     async fn set_company_id(&mut self, company_id: String) {
         let mut session = self.session_handle.write().await;
         session.insert(COMPANY_ID_KEY, company_id).expect("Could not store company_id");
+    }
+
+    async fn get_company_name(&self) -> Option<String> {
+        let session = self.session_handle.read().await;
+        session.get::<String>(COMPANY_NAME_KEY)
+    }
+
+    async fn set_company_name(&mut self, company_name: String) {
+        let mut session = self.session_handle.write().await;
+        session.insert(COMPANY_NAME_KEY, company_name).expect("Could not store company_name");
     }
     
     async fn is_login(&self) -> bool {

@@ -37,9 +37,11 @@ pub async fn create_bpmn(Json(mut bpmn_dto): Json<BpmnDto>, session_facade: Sess
 
     let deployer_id = session_facade.get_user_id().await.expect("Unexpected error");
     let company_id = session_facade.get_company_id().await.expect("Unexpected error");
+    let deployer_name = session_facade.get_user_name().await.expect("Unexpected error");
+    let company_name = session_facade.get_company_name().await.expect("Unexpected error");
 
     let repo_service = RepositoryService::new();
-    let procdef_rst = repo_service.create_procdef(&bpmn_dto.bpmn_name, &company_id, &deployer_id, &bpmn_dto.bpmn_xml).await;
+    let procdef_rst = repo_service.create_procdef(&bpmn_dto.bpmn_name, &deployer_id, &deployer_name, &company_id, &company_name, &bpmn_dto.bpmn_xml).await;
     let procdef = match procdef_rst {
         Ok(p_def) => p_def,
         Err(error) => {

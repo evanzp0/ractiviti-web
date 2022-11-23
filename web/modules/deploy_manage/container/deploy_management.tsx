@@ -14,7 +14,7 @@ import DeploymentDto from "../model/deployment_dto";
 import {PageDto, Pagination as DeploymentPg} from "../../../common/model/pagination";
 import DeploymentService from "../service/deployment_service";
 import PageDataGrid from "../../../common/component/data_grid";
-import {dts_to_utc, utc_to_dt} from "../../../common/util/datetime";
+import {utc_to_dt} from "../../../common/util/datetime";
 import DateField from "../../../common/component/data_field";
 import { Dayjs } from "dayjs";
 
@@ -42,25 +42,25 @@ export default function DeployManagement() {
     } = useForm<DeploymentDto>();
 
     const columns: GridColDef[] = [
-        { field: 'id', headerName: 'ID', width: 90 },
+        { field: 'id', headerName: 'ID', width: 300 },
         {
             field: 'name',
             headerName: '流程名称',
-            width: 150,
+            width: 250,
             editable: false,
         },
         {
             field: 'key',
             headerName: '流程KEY',
-            width: 150,
+            width: 300,
         },
         {
-            field: 'organization',
+            field: 'company_name',
             headerName: '公司',
-            width: 150,
+            width: 250,
         },
         {
-            field: 'deployer',
+            field: 'deployer_name',
             headerName: '发布人',
             width: 150,
         },
@@ -68,7 +68,7 @@ export default function DeployManagement() {
             field: 'deploy_time',
             headerName: '发布时间',
             sortable: false,
-            width: 250,
+            width: 150,
             valueGetter: (params: GridValueGetterParams) =>
             `${utc_to_dt(params.row.deploy_time).toLocaleString('zh-CN')}`,
         },
@@ -132,16 +132,16 @@ export default function DeployManagement() {
                     <TextField
                         label="流程KEY"
                         type="text"
-                        id="name"
+                        id="key"
                         size='small'
                         {...register('key')}
                     />
                     <TextField
                         label="发布人"
                         type="text"
-                        id="name"
+                        id="deployer_name"
                         size='small'
-                        {...register('deployer')}
+                        {...register('deployer_name')}
                     />
                     <DateField 
                         id="deploy_time_from"
