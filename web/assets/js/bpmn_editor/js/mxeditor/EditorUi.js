@@ -4265,7 +4265,10 @@ EditorUi.prototype.publishBpmn = function()
 	// 如果是编辑BPMN则不使用对话框
 	if (this.editor.filename != null)
 	{
-		this.publish(this.editor.getOrCreateFilename());
+		let is_ok = confirm("确定要发布流程吗？");
+		if (is_ok) {
+			this.publish(this.editor.getOrCreateFilename());
+		}
 	}
 	else
 	{
@@ -4348,9 +4351,9 @@ EditorUi.prototype.publish = function(name)
 				_this.editor.setBpmnId(data.bpmn_id);
 				_this.updateDocumentTitle();
 
-				history.pushState('', '', '/bpmn/' + data.bpmn_id + '/edit');
-
 				_this.hideDialog(null, true);
+				history.pushState('', '', '/bpmn/' + data.bpmn_id + '/edit');
+				
 				alert("流程发布成功");
 			}
 		).catch(function(e) {
