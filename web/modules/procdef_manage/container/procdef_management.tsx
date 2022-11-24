@@ -9,16 +9,14 @@ import { GridColDef, GridValueGetterParams } from '@mui/x-data-grid';
 import React from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 
-import Deployment from "../model/deployment";
-import DeploymentDto from "../model/deployment_dto";
-import {PageDto, Pagination as DeploymentPg} from "../../../common/model/pagination";
-import DeploymentService from "../service/deployment_service";
+import Procdef from "../model/procdef";
+import ProcdefDto from "../model/procdef_dto";
+import {PageDto, Pagination as ProcdefPg} from "../../../common/model/pagination";
+import ProcdefService from "../service/procdef_service";
 import PageDataGrid from "../../../common/component/data_grid";
 import {utc_to_dt} from "../../../common/util/datetime";
-import DateField from "../../../common/component/data_field";
-import { Dayjs } from "dayjs";
 
-let defaultPg: DeploymentPg<Deployment> = {
+let defaultPg: ProcdefPg<Procdef> = {
     page_no: 0,
     page_size: 2,
     total: 0,
@@ -26,23 +24,23 @@ let defaultPg: DeploymentPg<Deployment> = {
     data: [],
 };
 
-let pg_dto: PageDto<DeploymentDto> = {
+let pg_dto: PageDto<ProcdefDto> = {
     data: null,
     page_no: 0,
     page_size: 2,
 };
 
 export default function DeployManagement() {
-    const [deploymentPg, setDeploymentPg] = React.useState<DeploymentPg<Deployment>>(defaultPg);
+    const [procdefPg, setProcdefPg] = React.useState<ProcdefPg<Procdef>>(defaultPg);
 
     const {
         register,
         handleSubmit,
         control,
-    } = useForm<DeploymentDto>();
+    } = useForm<ProcdefDto>();
 
     const columns: GridColDef[] = [
-        { field: 'id', headerName: 'ID', width: 300 },
+        { field: 'id', headerName: '流程定义ID', width: 300 },
         {
             field: 'name',
             headerName: '流程名称',
@@ -52,6 +50,11 @@ export default function DeployManagement() {
         {
             field: 'key',
             headerName: '流程KEY',
+            width: 300,
+        },
+        {
+            field: 'version',
+            headerName:'版本号',
             width: 300,
         },
         {
@@ -65,6 +68,13 @@ export default function DeployManagement() {
             width: 150,
         },
         {
+            field: 'suspension_state',
+            headerName: '是否挂起',
+            width: 150,
+            valueGetter: (params: GridValueGetterParams) => 
+                `${params.row.suspension_state == 0 ? "否" : "是"}`,
+        },
+        {
             field: 'deploy_time',
             headerName: '发布时间',
             sortable: false,
@@ -74,18 +84,15 @@ export default function DeployManagement() {
         },
     ];
         
-    const handlePageQuery: SubmitHandler<DeploymentDto> = (deployment_dto) => {
-        deployment_dto.deploy_time_from = (deployment_dto.deploy_time_from as Dayjs)?.valueOf();
-        deployment_dto.deploy_time_to = (deployment_dto.deploy_time_to as Dayjs)?.valueOf();
-
-        pg_dto.data = deployment_dto;
+    const handlePageQuery: SubmitHandler<ProcdefDto> = (procdef_dto) => {
+        pg_dto.data = procdef_dto;
         pg_dto.page_no = 0;
 
-        DeploymentService.page_query(pg_dto)
+        ProcdefService.page_query(pg_dto)
             .then((result: any) => {
-                let rst = result as DeploymentPg<Deployment>;
+                let rst = result as ProcdefPg<Procdef>;
 
-                setDeploymentPg(rst);
+                setProcdefPg(rst);
             }
         );
     };
@@ -94,10 +101,10 @@ export default function DeployManagement() {
         if (pg_dto.data != null) {
             pg_dto.page_no = pageNo;
 
-            DeploymentService.page_query(pg_dto)
+            ProcdefService.page_query(pg_dto)
                 .then((result: any) => {
-                    let rst = result as DeploymentPg<Deployment>;
-                    setDeploymentPg(result);
+                    let rst = result as ProcdefPg<Procdef>;
+                    setProcdefPg(result);
                 }
             );
         }
@@ -111,7 +118,7 @@ export default function DeployManagement() {
         <Box sx={{width: '100%'}}>
             <Toolbar>
                 <Typography variant="h5" noWrap component="div" >
-                        发布日志
+                        流程管理
                 </Typography>
                 <Stack direction="row" spacing={0} ml={2}>
                     <Button onClick={handleNewBpmn}>新增流程</Button>
@@ -141,38 +148,20 @@ export default function DeployManagement() {
                         {...register('key')}
                     />
                     <TextField
-                        label="发布人"
+                        label="发布日志ID"
                         type="text"
-                        id="deployer_name"
+                        id="deployment_id"
                         size='small'
-                        {...register('deployer_name')}
-                    />
-                    <DateField 
-                        id="deploy_time_from"
-                        name="deploy_time_from" 
-                        label="发布日期From" 
-                        sx={{ width: 220 }}
-                        size='small'
-                        inputFormat='YYYY/MM/DD'
-                        control={control}
-                    />
-                    <DateField 
-                        id="deploy_time_to"
-                        name="deploy_time_to" 
-                        label="发布日期To" 
-                        sx={{ width: 220 }}
-                        size='small'
-                        inputFormat='YYYY/MM/DD'
-                        control={control}
+                        {...register('deployment_id')}
                     />
                     <Button variant="contained" type='submit'>查询</Button>
                 </Stack>
                 <Box mt={2} style={{ height: 700, width: '100%' }}>
                     <PageDataGrid 
-                        rows={deploymentPg.data}
+                        rows={procdefPg.data}
                         columns={columns}
-                        page={deploymentPg.page_no + 1}
-                        count={deploymentPg.total_page}
+                        page={procdefPg.page_no + 1}
+                        count={procdefPg.total_page}
                         onChange={(_, pageNo) => handleChangePageNo(pageNo - 1)}
                     />
                 </Box>

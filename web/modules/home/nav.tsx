@@ -16,9 +16,9 @@ import Typography from '@mui/material/Typography';
 import {Link} from 'react-router-dom';
 import { Route, Routes } from 'react-router';
 import Dashboard from '../dashboard';
-import DeployManage from '../deploy_manage';
-import ProcessManage from '../process_manage';
-import UserManager from '../user_manage';
+import DeployManagement from '../deploy_manage';
+import ProcdefManagement from '../procdef_manage';
+import UserManagement from '../user_manage';
 import ChangePassword from '../change_password';
 import Logout from '../logout';
 
@@ -179,9 +179,9 @@ export default function ResponsiveDrawer(props: Props) {
                 <Toolbar />
                 <Routes>
                     <Route path='/dashboard' element={<Dashboard/>} />
-                    <Route path='/deploy_manage' element={<DeployManage/>} />
-                    <Route path='/process_manage' element={<ProcessManage/>} />
-                    <Route path='/user_manager' element={<UserManager/>} />
+                    <Route path='/deploy_manage' element={<DeployManagement/>} />
+                    <Route path='/process_manage' element={<ProcdefManagement/>} />
+                    <Route path='/user_manager' element={<UserManagement/>} />
                     <Route path='/change_password' element={<ChangePassword/>} />
                     <Route path='/logout' element={<Logout/>} />
                 </Routes>
