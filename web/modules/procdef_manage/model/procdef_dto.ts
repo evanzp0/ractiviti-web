@@ -3,5 +3,7 @@ export default interface ProcdefDto {
     name:  String,
     key: String,
     deployment_id: string,
+    deployer_name: string,
+    company_name: string,
     suspension_state: number,
 }

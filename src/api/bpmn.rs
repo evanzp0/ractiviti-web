@@ -1,7 +1,6 @@
 use axum::{response::IntoResponse, extract::Path, Json};
 use ractiviti_core::{error::{ErrorCode, AppError}, service::engine::RepositoryService};
 use serde::Deserialize;
-use serde_json::json;
 
 use ractiviti_core::dto::BpmnResultDto;
 use crate::{common::ApiResult, handles::{SessionFacade, SessionFacadeInerface}};

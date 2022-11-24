@@ -18,7 +18,7 @@ import {utc_to_dt} from "../../../common/util/datetime";
 
 let defaultPg: ProcdefPg<Procdef> = {
     page_no: 0,
-    page_size: 2,
+    page_size: 10,
     total: 0,
     total_page: 0,
     data: [],
@@ -27,7 +27,7 @@ let defaultPg: ProcdefPg<Procdef> = {
 let pg_dto: PageDto<ProcdefDto> = {
     data: null,
     page_no: 0,
-    page_size: 2,
+    page_size: 10,
 };
 
 export default function DeployManagement() {
@@ -55,7 +55,7 @@ export default function DeployManagement() {
         {
             field: 'version',
             headerName:'版本号',
-            width: 300,
+            width: 80,
         },
         {
             field: 'company_name',
@@ -70,7 +70,7 @@ export default function DeployManagement() {
         {
             field: 'suspension_state',
             headerName: '是否挂起',
-            width: 150,
+            width: 80,
             valueGetter: (params: GridValueGetterParams) => 
                 `${params.row.suspension_state == 0 ? "否" : "是"}`,
         },

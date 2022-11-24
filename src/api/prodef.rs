@@ -1,21 +1,15 @@
 use axum::{Json, response::IntoResponse};
 use dysql::PageDto;
 use hyper::StatusCode;
-use serde::Deserialize;
-use serde_json::json;
+use ractiviti_core::{dto::ProcdefDto, service::engine::RepositoryService};
 
 use crate::common::ApiResult;
 
-#[derive(Deserialize, Debug)]
-pub struct ProcdefDto {
-}
+pub async fn procdef_query(Json(mut pg_dto): Json<PageDto<ProcdefDto>>) -> ApiResult<impl IntoResponse> {
+    pg_dto.data.trim();
 
-impl ProcdefDto {
-    pub fn trim(&mut self) {
-    }
-}
+    let repo_service = RepositoryService::new();
+    let rst = repo_service.query_procdef_by_page(&mut pg_dto).await?;
 
-pub async fn deployment_query(Json(mut pg_dto): Json<PageDto<ProcdefDto>>) -> ApiResult<impl IntoResponse> {
-    
-    Ok((StatusCode::OK, Json(json!({"rst": "1"}))).into_response())
+    Ok((StatusCode::OK, Json(rst)).into_response())
 }
