@@ -15,7 +15,7 @@ import {PageDto, Pagination as DeploymentPg} from "../../../common/model/paginat
 import DeploymentService from "../service/deployment_service";
 import PageDataGrid from "../../../common/component/data_grid";
 import {utc_to_dt} from "../../../common/util/datetime";
-import DateField from "../../../common/component/data_field";
+import DateField from "../../../common/component/date_field";
 import { Dayjs } from "dayjs";
 
 let defaultPg: DeploymentPg<Deployment> = {
