@@ -3,10 +3,10 @@ use dysql::PageDto;
 use hyper::StatusCode;
 use ractiviti_core::{dto::DeploymentDto, service::engine::RepositoryService, common::LocalTimeStamp};
 
-use crate::common::WebResult;
+use crate::common::ApiResult;
 
 
-pub async fn deployment_query(Json(mut pg_dto): Json<PageDto<DeploymentDto>>) -> WebResult<impl IntoResponse> {
+pub async fn deployment_query(Json(mut pg_dto): Json<PageDto<DeploymentDto>>) -> ApiResult<impl IntoResponse> {
     
     if let Some(dt) = pg_dto.data.deploy_time_to {
         pg_dto.data.deploy_time_to = Some(LocalTimeStamp::new(dt).add_days(1).timestamp_millis());

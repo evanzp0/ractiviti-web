@@ -109,8 +109,3 @@ pub async fn publish_bpmn_by_procdef(Path(procdef_id): Path<String>, Json(mut bp
 
     Ok(Json(bpmn_result))
 }
-
-pub async fn delete_bpmn(Path(procdef_id): Path<String>) -> ApiResult<impl IntoResponse> {
-
-    Ok(Json(json!({ "msg": format!("bpmn deleted: {}", procdef_id) })))
-}
