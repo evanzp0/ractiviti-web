@@ -2,6 +2,7 @@ import React from "react"
 import Pagination from "@mui/material/Pagination";
 import { GridColumns, GridRowsProp } from "@mui/x-data-grid";
 import { GridInitialStatePro } from "x-data-grid/src/models/gridStatePro";
+// import { DataGrid} from "@mui/x-data-grid";
 // import { DataGridPro } from "@mui/x-data-grid-pro";
 import { DataGridPro } from './mui_pro/data_grid_pro/DataGridPro'
 
@@ -13,6 +14,7 @@ export default function PageDataGrid(props: PageDataGridProps) {
         paginationMode='server'
         rows={props.rows}
         columns={props.columns}
+        pagination={true}
         components={{
             Pagination: () => 
                 <Pagination
