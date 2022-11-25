@@ -38,7 +38,6 @@
     "@mui/icons-material": "^5.10.6",
     "@mui/lab": "^5.0.0-alpha.106",
     "@mui/material": "^5.10.15",
-    "@mui/x-data-grid": "^5.17.13",
     "@mui/x-data-grid-pro": "^5.17.13",
     "@mui/x-date-pickers": "^5.0.8",
     "@reduxjs/toolkit": "^1.8.5",
@@ -54,7 +53,6 @@
     "redux": "^4.2.0",
     "redux-logger": "^3.0.6",
     "redux-thunk": "^2.4.1",
-    "x-data-grid": "file:../x-data-grid",
     "zod": "^3.19.1"
   }
 }

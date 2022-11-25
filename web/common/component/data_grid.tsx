@@ -1,9 +1,12 @@
 import React from "react"
-import { DataGrid, GridColDef, GridColumns, GridRowsProp, GridValueGetterParams } from '@mui/x-data-grid';
 import Pagination from "@mui/material/Pagination";
+import { GridColumns, GridRowsProp } from "@mui/x-data-grid";
+import { GridInitialStatePro } from "x-data-grid/src/models/gridStatePro";
+import { DataGridPro } from "@mui/x-data-grid-pro";
+// import { DataGridPro } from './data_grid_pro/DataGridPro'
 
 export default function PageDataGrid(props: PageDataGridProps) {
-    return <DataGrid
+    return <DataGridPro
         disableColumnFilter={true}
         autoHeight = {true}
         disableSelectionOnClick
@@ -27,10 +30,12 @@ export default function PageDataGrid(props: PageDataGridProps) {
                 justifyContent: 'center'
             }
         }}
+        initialState={props.initialState}
     />
 }
 
 interface PageDataGridProps {
+    initialState?: GridInitialStatePro,
     rows: GridRowsProp,
     columns: GridColumns,
     page?: number,

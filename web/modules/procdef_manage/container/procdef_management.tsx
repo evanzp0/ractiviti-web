@@ -4,7 +4,7 @@ import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
-import { GridColDef, GridValueGetterParams } from '@mui/x-data-grid';
+import { GridActionsCellItem, GridColumns, GridValueGetterParams } from '@mui/x-data-grid';
 
 import React from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
@@ -15,6 +15,8 @@ import {PageDto, Pagination as ProcdefPg} from "../../../common/model/pagination
 import ProcdefService from "../service/procdef_service";
 import PageDataGrid from "../../../common/component/data_grid";
 import {utc_to_dt} from "../../../common/util/datetime";
+import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
 
 let defaultPg: ProcdefPg<Procdef> = {
     page_no: 0,
@@ -39,7 +41,7 @@ export default function DeployManagement() {
         control,
     } = useForm<ProcdefDto>();
 
-    const columns: GridColDef[] = [
+    const columns: GridColumns = [
         { field: 'id', headerName: '流程定义ID', width: 300 },
         {
             field: 'name',
@@ -81,6 +83,15 @@ export default function DeployManagement() {
             width: 200,
             valueGetter: (params: GridValueGetterParams) =>
                 `${utc_to_dt(params.row.deploy_time).toLocaleString('zh-CN')}`,
+        },
+        {
+          field: 'actions',
+          type: 'actions',
+          width: 100,
+          getActions: () => [
+            <GridActionsCellItem icon={<EditIcon />} label="Edit" />,
+            <GridActionsCellItem icon={<DeleteIcon />} label="Delete" />,
+          ],
         },
     ];
         
@@ -163,6 +174,7 @@ export default function DeployManagement() {
                         page={procdefPg.page_no + 1}
                         count={procdefPg.total_page}
                         onChange={(_, pageNo) => handleChangePageNo(pageNo - 1)}
+                        initialState={{ pinnedColumns: { right: ['actions'] } }}
                     />
                 </Box>
             </Box>
