@@ -2,8 +2,8 @@ import React from "react"
 import Pagination from "@mui/material/Pagination";
 import { GridColumns, GridRowsProp } from "@mui/x-data-grid";
 import { GridInitialStatePro } from "x-data-grid/src/models/gridStatePro";
-import { DataGridPro } from "@mui/x-data-grid-pro";
-// import { DataGridPro } from './data_grid_pro/DataGridPro'
+// import { DataGridPro } from "@mui/x-data-grid-pro";
+import { DataGridPro } from './mui_pro/data_grid_pro/DataGridPro'
 
 export default function PageDataGrid(props: PageDataGridProps) {
     return <DataGridPro

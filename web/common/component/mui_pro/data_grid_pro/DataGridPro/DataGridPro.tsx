@@ -1,6 +1,7 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import { useLicenseVerifier, Watermark } from '@mui/x-license-pro';
+import { useLicenseVerifier} from '../../license_pro/useLicenseVerifier';
+// import {Watermark} from '@mui/x-license-pro';
 import { chainPropTypes } from '@mui/utils';
 import {
   GridBody,
@@ -11,12 +12,12 @@ import {
   GridContextProvider,
   GridValidRowModel,
 } from '@mui/x-data-grid';
-import { useDataGridProComponent } from './useDataGridProComponent';
-import { DataGridProProps } from '../models/dataGridProProps';
-import { useDataGridProProps } from './useDataGridProProps';
-import { DataGridProVirtualScroller } from '../components/DataGridProVirtualScroller';
-import { DataGridProColumnHeaders } from '../components/DataGridProColumnHeaders';
-import { getReleaseInfo } from '../utils/releaseInfo';
+import { useDataGridProComponent } from '@mui/x-data-grid-pro/DataGridPro/useDataGridProComponent';
+import { DataGridProProps } from '@mui/x-data-grid-pro';
+import { useDataGridProProps } from '@mui/x-data-grid-pro/DataGridPro/useDataGridProProps';
+import { DataGridProVirtualScroller } from '@mui/x-data-grid-pro/components/DataGridProVirtualScroller';
+import { DataGridProColumnHeaders } from '@mui/x-data-grid-pro/components/DataGridProColumnHeaders';
+import { getReleaseInfo } from '@mui/x-data-grid-pro/utils/releaseInfo';
 
 const releaseInfo = getReleaseInfo();
 
@@ -37,7 +38,7 @@ const DataGridProRaw = React.forwardRef(function DataGridPro<R extends GridValid
             ColumnHeadersComponent={DataGridProColumnHeaders}
             VirtualScrollerComponent={DataGridProVirtualScroller}
           >
-            <Watermark packageName="x-data-grid-pro" releaseInfo={releaseInfo} />
+            {/* <Watermark packageName="x-data-grid-pro" releaseInfo={releaseInfo} /> */}
           </GridBody>
           <GridFooterPlaceholder />
         </GridErrorHandler>
