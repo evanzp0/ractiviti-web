@@ -161,9 +161,25 @@ export default function DeployManagement() {
         setOpenQuery(false);
     }
 
+    const handleQuery: (dto: ProcdefDto) => void = () => {
+        // todo
+        setOpenQuery(false);
+    }
+
+    const fields = [
+        {name: "id", label:"ID", type: "text", value: null}
+    ];
+
     return (
         <Fragment>
-            <QueryDialog open={openQuery} fullWidth={true} maxWidth={"lg"} onClose={handleCloseQuery}/>
+            <QueryDialog
+                open={openQuery} 
+                fullWidth={true} 
+                maxWidth={"lg"}
+                fields={fields}
+                onClose={handleCloseQuery} 
+                onQuery={handleQuery}
+            />
             <Box sx={{width: '100%'}}>
                 <Toolbar>
                     <Typography variant="h5" noWrap component="div" >
