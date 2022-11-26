@@ -30,6 +30,7 @@ let pg_dto: PageDto<ProcdefDto> = {
     data: null,
     page_no: 0,
     page_size: 5,
+    sort_model: null
 };
 
 export default function DeployManagement() {

@@ -1,6 +1,6 @@
 import React from "react"
 import Pagination from "@mui/material/Pagination";
-import { GridColumns, GridRowsProp } from "@mui/x-data-grid";
+import { GridCallbackDetails, GridColumns, GridRowsProp, GridSortModel } from "@mui/x-data-grid";
 // import { DataGrid} from "@mui/x-data-grid";
 // import { DataGridPro } from "@mui/x-data-grid-pro";
 import { DataGridPro } from './mui_pro/data_grid_pro/DataGridPro'
@@ -24,9 +24,12 @@ export default function PageDataGrid(props: PageDataGridProps) {
         autoHeight = {true}
         disableSelectionOnClick
         paginationMode='server'
+        sortingMode='server'
         rows={props.rows}
         columns={props.columns}
         pagination={true}
+        sortModel={props.sortModel}
+        onSortModelChange={props.onSortModelChange}
         components={{
             Pagination: () => 
             <Box sx={{display: "flex", width: "100%", justifyContent: "space-between", alignItems: "center"}}>
@@ -85,4 +88,6 @@ interface PageDataGridProps {
     rowsPerPageOptions?: Array<number>,
     onChange?: (event: React.ChangeEvent<unknown>, page: number) => void,
     onPageSizeChange?: (event: SelectChangeEvent<unknown>, size: number) => void;
+    sortModel?: GridSortModel,
+    onSortModelChange?: (model: GridSortModel, details: GridCallbackDetails) => void,
 }

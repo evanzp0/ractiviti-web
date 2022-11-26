@@ -4,7 +4,7 @@ import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
-import { GridColDef, GridValueGetterParams } from '@mui/x-data-grid';
+import { GridColDef, GridSortModel, GridValueGetterParams } from '@mui/x-data-grid';
 
 import React from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
@@ -30,6 +30,7 @@ let pg_dto: PageDto<DeploymentDto> = {
     data: null,
     page_no: 0,
     page_size: 5,
+    sort_model: null,
 };
 
 export default function DeployManagement() {
@@ -67,7 +68,7 @@ export default function DeployManagement() {
         {
             field: 'deploy_time',
             headerName: '发布时间',
-            sortable: false,
+            sortable: true,
             width: 200,
             valueGetter: (params: GridValueGetterParams) =>
                 `${utc_to_dt(params.row.deploy_time).toLocaleString('zh-CN')}`,
@@ -115,6 +116,18 @@ export default function DeployManagement() {
                 }
             );
         }
+    }
+
+    const handleSortColumn: (newSortModel: GridSortModel) => void = (newSortModel) => {
+        pg_dto.sort_model = newSortModel;
+        pg_dto.page_no = 0;
+
+        DeploymentService.page_query(pg_dto)
+            .then((result: any) => {
+                let rst = result as DeploymentPg<Deployment>;
+                setDeploymentPg(result);
+            }
+        );
     }
 
     const handleNewBpmn: () => void = () => {
@@ -191,6 +204,7 @@ export default function DeployManagement() {
                         page_count={deploymentPg.total_page}
                         onChange={(_, pageNo) => handleChangePageNo(pageNo - 1)}
                         onPageSizeChange={(_, size) => handlePageSizeChange(size)}
+                        onSortModelChange={handleSortColumn}
                     />
                 </Box>
             </Box>
