@@ -4,7 +4,7 @@ import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
-import { GridActionsCellItem, GridColumns, GridValueGetterParams } from '@mui/x-data-grid';
+import { GridActionsCellItem, GridColumns, GridSortModel, GridValueGetterParams } from '@mui/x-data-grid';
 
 import React from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
@@ -80,7 +80,6 @@ export default function DeployManagement() {
         {
             field: 'deploy_time',
             headerName: '发布时间',
-            sortable: false,
             width: 200,
             valueGetter: (params: GridValueGetterParams) =>
                 `${utc_to_dt(params.row.deploy_time).toLocaleString('zh-CN')}`,
@@ -134,6 +133,18 @@ export default function DeployManagement() {
                 }
             );
         }
+    }
+
+    const handleSortColumn: (newSortModel: GridSortModel) => void = (newSortModel) => {
+        pg_dto.sort_model = newSortModel;
+        pg_dto.page_no = 0;
+
+        ProcdefService.page_query(pg_dto)
+            .then((result: any) => {
+                let rst = result as ProcdefPg<Procdef>;
+                setProcdefPg(rst);
+            }
+        );
     }
 
     const handleNewBpmn: () => void = () => {
@@ -193,6 +204,7 @@ export default function DeployManagement() {
                         initialState={{ pinnedColumns: { right: ['actions'] } }}
                         onChange={(_, pageNo) => handleChangePageNo(pageNo - 1)}
                         onPageSizeChange={(_, size) => handlePageSizeChange(size)}
+                        onSortModelChange={handleSortColumn}
                     />
                 </Box>
             </Box>

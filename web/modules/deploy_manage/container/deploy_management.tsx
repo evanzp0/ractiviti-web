@@ -112,7 +112,7 @@ export default function DeployManagement() {
             DeploymentService.page_query(pg_dto)
                 .then((result: any) => {
                     let rst = result as DeploymentPg<Deployment>;
-                    setDeploymentPg(result);
+                    setDeploymentPg(rst);
                 }
             );
         }
@@ -125,7 +125,7 @@ export default function DeployManagement() {
         DeploymentService.page_query(pg_dto)
             .then((result: any) => {
                 let rst = result as DeploymentPg<Deployment>;
-                setDeploymentPg(result);
+                setDeploymentPg(rst);
             }
         );
     }
