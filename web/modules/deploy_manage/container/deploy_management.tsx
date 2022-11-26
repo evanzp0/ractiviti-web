@@ -171,6 +171,7 @@ export default function DeployManagement() {
                     <PageDataGrid 
                         rows={deploymentPg.data}
                         columns={columns}
+                        total={deploymentPg.total}
                         page={deploymentPg.page_no + 1}
                         count={deploymentPg.total_page}
                         onChange={(_, pageNo) => handleChangePageNo(pageNo - 1)}
