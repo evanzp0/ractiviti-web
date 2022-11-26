@@ -6,7 +6,7 @@ import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import { GridActionsCellItem, GridColumns, GridSortModel, GridValueGetterParams } from '@mui/x-data-grid';
 
-import React from "react";
+import React, { Fragment, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 
 import Procdef from "../model/procdef";
@@ -17,6 +17,7 @@ import PageDataGrid from "../../../common/component/data_grid";
 import {utc_to_dt} from "../../../common/util/datetime";
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
+import QueryDialog from "../../../common/component/query_dialog";
 
 let defaultPg: ProcdefPg<Procdef> = {
     page_no: 0,
@@ -34,7 +35,8 @@ let pg_dto: PageDto<ProcdefDto> = {
 };
 
 export default function DeployManagement() {
-    const [procdefPg, setProcdefPg] = React.useState<ProcdefPg<Procdef>>(defaultPg);
+    const [procdefPg, setProcdefPg] = useState<ProcdefPg<Procdef>>(defaultPg);
+    const [openQuery, setOpenQuery] = useState<boolean>(false);
 
     const {
         register,
@@ -151,63 +153,75 @@ export default function DeployManagement() {
         window.open("/bpmn/new");
     }
 
+    const handleOpenQuery: () => void = () => {
+        setOpenQuery(true);
+    }
+
+    const handleCloseQuery: () => void = () => {
+        setOpenQuery(false);
+    }
+
     return (
-        <Box sx={{width: '100%'}}>
-            <Toolbar>
-                <Typography variant="h5" noWrap component="div" >
-                        流程管理
-                </Typography>
-                <Stack direction="row" spacing={0} ml={2}>
-                    <Button onClick={handleNewBpmn}>新增流程</Button>
-                </Stack>
-            </Toolbar>
-            <Box component="form" onSubmit={handleSubmit(handlePageQuery)} noValidate ml={2} mr={2} >
-                <Stack direction="row" spacing={1} >
-                    <TextField
-                        label="流程ID"
-                        type="text"
-                        id="id"
-                        size='small'
-                        {...register('id')}
-                    />
-                    <TextField
-                        label="流程名"
-                        type="text"
-                        id="name"
-                        size='small'
-                        {...register('name')}
-                    />
-                    <TextField
-                        label="流程KEY"
-                        type="text"
-                        id="key"
-                        size='small'
-                        {...register('key')}
-                    />
-                    <TextField
-                        label="发布日志ID"
-                        type="text"
-                        id="deployment_id"
-                        size='small'
-                        {...register('deployment_id')}
-                    />
-                    <Button variant="contained" type='submit'>查询</Button>
-                </Stack>
-                <Box mt={2} style={{ height: 700, width: '100%' }}>
-                    <PageDataGrid 
-                        rows={procdefPg.data}
-                        columns={columns}
-                        page={procdefPg.page_no + 1}
-                        page_count={procdefPg.total_page}
-                        pageSize={pg_dto.page_size}
-                        total={procdefPg.total}
-                        initialState={{ pinnedColumns: { right: ['actions'] } }}
-                        onChange={(_, pageNo) => handleChangePageNo(pageNo - 1)}
-                        onPageSizeChange={(_, size) => handlePageSizeChange(size)}
-                        onSortModelChange={handleSortColumn}
-                    />
+        <Fragment>
+            <QueryDialog open={openQuery} fullWidth={true} maxWidth={"lg"} onClose={handleCloseQuery}/>
+            <Box sx={{width: '100%'}}>
+                <Toolbar>
+                    <Typography variant="h5" noWrap component="div" >
+                            流程管理
+                    </Typography>
+                    <Stack direction="row" spacing={0} ml={2}>
+                        <Button onClick={handleNewBpmn}>新增流程</Button>
+                        <Button onClick={handleOpenQuery}>高级查询</Button>
+                    </Stack>
+                </Toolbar>
+                <Box component="form" onSubmit={handleSubmit(handlePageQuery)} noValidate ml={2} mr={2} >
+                    <Stack direction="row" spacing={1} >
+                        <TextField
+                            label="流程ID"
+                            type="text"
+                            id="id"
+                            size='small'
+                            {...register('id')}
+                        />
+                        <TextField
+                            label="流程名"
+                            type="text"
+                            id="name"
+                            size='small'
+                            {...register('name')}
+                        />
+                        <TextField
+                            label="流程KEY"
+                            type="text"
+                            id="key"
+                            size='small'
+                            {...register('key')}
+                        />
+                        <TextField
+                            label="发布日志ID"
+                            type="text"
+                            id="deployment_id"
+                            size='small'
+                            {...register('deployment_id')}
+                        />
+                        <Button variant="contained" type='submit'>查询</Button>
+                    </Stack>
+                    <Box mt={2} style={{ height: 700, width: '100%' }}>
+                        <PageDataGrid 
+                            rows={procdefPg.data}
+                            columns={columns}
+                            page={procdefPg.page_no + 1}
+                            page_count={procdefPg.total_page}
+                            pageSize={pg_dto.page_size}
+                            total={procdefPg.total}
+                            initialState={{ pinnedColumns: { right: ['actions'] } }}
+                            onChange={(_, pageNo) => handleChangePageNo(pageNo - 1)}
+                            onPageSizeChange={(_, size) => handlePageSizeChange(size)}
+                            onSortModelChange={handleSortColumn}
+                        />
+                    </Box>
                 </Box>
             </Box>
-        </Box>
+        </Fragment>
     )
 }

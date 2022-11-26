@@ -93,6 +93,7 @@ export default function ChangePassword() {
 
     return (
         <ThemeProvider theme={theme}>
+            <div></div>
             <Notification open={notifing} message={notify_message} severity={notify_severity} onClose={() => setNotifing(false)} />
             <Box component="form" onSubmit={handleSubmit(handleChangePassword, handleError)} noValidate sx={{maxWidth: '20rem' }} >
                 <FormControl variant="standard" fullWidth sx={{ mt: 1 }}>
