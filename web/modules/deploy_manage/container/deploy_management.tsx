@@ -20,7 +20,7 @@ import { Dayjs } from "dayjs";
 
 let defaultPg: DeploymentPg<Deployment> = {
     page_no: 0,
-    page_size: 2,
+    page_size: 5,
     total: 0,
     total_page: 0,
     data: [],
@@ -29,7 +29,7 @@ let defaultPg: DeploymentPg<Deployment> = {
 let pg_dto: PageDto<DeploymentDto> = {
     data: null,
     page_no: 0,
-    page_size: 2,
+    page_size: 5,
 };
 
 export default function DeployManagement() {
@@ -103,6 +103,20 @@ export default function DeployManagement() {
         }
     };
 
+    const handlePageSizeChange: (size: number) => void = (size) => { 
+        if (pg_dto.data != null) {
+            pg_dto.page_size = size;
+            pg_dto.page_no = 0;
+
+            DeploymentService.page_query(pg_dto)
+                .then((result: any) => {
+                    let rst = result as DeploymentPg<Deployment>;
+                    setDeploymentPg(result);
+                }
+            );
+        }
+    }
+
     const handleNewBpmn: () => void = () => {
         window.open("/bpmn/new");
     }
@@ -173,8 +187,10 @@ export default function DeployManagement() {
                         columns={columns}
                         total={deploymentPg.total}
                         page={deploymentPg.page_no + 1}
-                        count={deploymentPg.total_page}
+                        pageSize={pg_dto.page_size}
+                        page_count={deploymentPg.total_page}
                         onChange={(_, pageNo) => handleChangePageNo(pageNo - 1)}
+                        onPageSizeChange={(_, size) => handlePageSizeChange(size)}
                     />
                 </Box>
             </Box>

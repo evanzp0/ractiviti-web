@@ -20,7 +20,7 @@ import EditIcon from '@mui/icons-material/Edit';
 
 let defaultPg: ProcdefPg<Procdef> = {
     page_no: 0,
-    page_size: 10,
+    page_size: 5,
     total: 0,
     total_page: 0,
     data: [],
@@ -29,7 +29,7 @@ let defaultPg: ProcdefPg<Procdef> = {
 let pg_dto: PageDto<ProcdefDto> = {
     data: null,
     page_no: 0,
-    page_size: 10,
+    page_size: 5,
 };
 
 export default function DeployManagement() {
@@ -121,6 +121,20 @@ export default function DeployManagement() {
         }
     };
 
+    const handlePageSizeChange: (size: number) => void = (size) => { 
+        if (pg_dto.data != null) {
+            pg_dto.page_size = size;
+            pg_dto.page_no = 0;
+
+            ProcdefService.page_query(pg_dto)
+                .then((result: any) => {
+                    let rst = result as ProcdefPg<Procdef>;
+                    setProcdefPg(result);
+                }
+            );
+        }
+    }
+
     const handleNewBpmn: () => void = () => {
         window.open("/bpmn/new");
     }
@@ -172,9 +186,12 @@ export default function DeployManagement() {
                         rows={procdefPg.data}
                         columns={columns}
                         page={procdefPg.page_no + 1}
-                        count={procdefPg.total_page}
-                        onChange={(_, pageNo) => handleChangePageNo(pageNo - 1)}
+                        page_count={procdefPg.total_page}
+                        pageSize={pg_dto.page_size}
+                        total={procdefPg.total}
                         initialState={{ pinnedColumns: { right: ['actions'] } }}
+                        onChange={(_, pageNo) => handleChangePageNo(pageNo - 1)}
+                        onPageSizeChange={(_, size) => handlePageSizeChange(size)}
                     />
                 </Box>
             </Box>

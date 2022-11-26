@@ -4,13 +4,20 @@ import { GridColumns, GridRowsProp } from "@mui/x-data-grid";
 // import { DataGrid} from "@mui/x-data-grid";
 // import { DataGridPro } from "@mui/x-data-grid-pro";
 import { DataGridPro } from './mui_pro/data_grid_pro/DataGridPro'
-import { Box, MenuItem, Select, Typography } from "@mui/material";
+import { Box, MenuItem, Select, SelectChangeEvent, Typography } from "@mui/material";
 import { GridInitialStatePro } from "@mui/x-data-grid-pro/models/gridStatePro";
 
-const defaultPgSizeOptions: Array<number> = [10, 20, 50];
+const defaultPgSizeOptions: Array<number> = [5, 10, 20];
 
 export default function PageDataGrid(props: PageDataGridProps) {
-    console.log(props)
+    
+    function handlePageSizeChange (event: SelectChangeEvent, child: React.ReactNode) {
+        if (props.onPageSizeChange) {
+            props.onPageSizeChange(event, event.target.value as unknown as number);
+        }
+    };
+
+    let pageSizeOptions = props.rowsPerPageOptions || defaultPgSizeOptions;
 
     return <DataGridPro
         disableColumnFilter={true}
@@ -25,33 +32,32 @@ export default function PageDataGrid(props: PageDataGridProps) {
             <Box sx={{display: "flex", width: "100%", justifyContent: "space-between", alignItems: "center"}}>
                 <Box sx={{display: "flex", alignItems: "center"}}>
                     {
-                        (props.count || 0 > 0) ? (
-                            <div>
-                            <Typography variant="button" display="block" ml={2} mr={1}>
-                                共 {props.total} 条记录，每页
-                            </Typography>
-                            <Select
-                                id="page_size"
-                                value={props.pageSize || defaultPgSizeOptions && defaultPgSizeOptions[0] }
-                                size="small"
-                                sx={{width: 70, height:30}}
-                                onChange={()=>{}}
-                            >
-                                {
-                                    defaultPgSizeOptions.map((size) => (
-                                        <MenuItem value={size}>{size}</MenuItem>
-                                    ))
-                                }
-                            </Select>
-                            </div>
+                        (props.page_count || 0 > 0) ? (
+                            <Box sx={{display: "flex", alignItems: "center"}}>
+                                <Typography variant="button" display="block" ml={2} mr={1}>
+                                    共 {props.total} 条记录，每页
+                                </Typography>
+                                <Select
+                                    id="page_size"
+                                    value={ (props.pageSize || pageSizeOptions[0]).toString() }
+                                    size="small"
+                                    sx={{width: 70, height:30}}
+                                    onChange={handlePageSizeChange}
+                                >
+                                    {
+                                        pageSizeOptions.map((size) => (
+                                            <MenuItem value={size}>{size}</MenuItem>
+                                        ))
+                                    }
+                                </Select>
+                            </Box>
                         ) : null
                     }
-                    
                 </Box>
                 <Pagination
                     color="primary"
                     page={props.page || 0}
-                    count={props.count || 0}
+                    count={props.page_count || 0}
                     onChange={props.onChange || function(){}}
                 />
             </Box>
@@ -73,9 +79,10 @@ interface PageDataGridProps {
     rows: GridRowsProp,
     columns: GridColumns,
     page?: number,
-    count?: number,
+    page_count?: number,
     pageSize?: number,
     total: number,
     rowsPerPageOptions?: Array<number>,
-    onChange?: (event: React.ChangeEvent<unknown>, page: number) => void
+    onChange?: (event: React.ChangeEvent<unknown>, page: number) => void,
+    onPageSizeChange?: (event: SelectChangeEvent<unknown>, size: number) => void;
 }
