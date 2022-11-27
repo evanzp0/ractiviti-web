@@ -167,15 +167,24 @@ export default function DeployManagement() {
     }
 
     const fields = [
-        {name: "id", label:"ID", type: "text", value: null}
+        {name: "id", label:"ID", type: "number", value: null},
+        {name: "name", label:"流程名称", type: "text", value: null},
+        {name: "deploy_time_from", label:"流程名称", type: "text", value: null},
+        {name: "deploy_time_to", label:"流程名称", type: "text", value: null},
+        {name: "id", label:"ID", type: "text", value: null},
+        {name: "name", label:"流程名称", type: "text", value: null},
+        {name: "deploy_time_from", label:"流程名称", type: "date", value: null},
+        {name: "deploy_time_to", label:"流程名称", type: "text", value: null},
+        {name: "id", label:"ID", type: "text", value: null},
+        {name: "name", label:"流程名称", type: "text", value: null},
+        {name: "deploy_time_from", label:"流程名称", type: "date", value: null},
+        {name: "deploy_time_to", label:"流程名称", type: "date", value: null},
     ];
 
     return (
         <Fragment>
             <QueryDialog
-                open={openQuery} 
-                fullWidth={true} 
-                maxWidth={"lg"}
+                open={openQuery}
                 fields={fields}
                 onClose={handleCloseQuery} 
                 onQuery={handleQuery}

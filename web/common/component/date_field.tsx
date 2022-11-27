@@ -16,19 +16,20 @@ export default function DateField (props: any) {
                 return (
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                         <DesktopDatePicker
-                        label={props.label}
-                        inputFormat={props.inputFormat}
-                        value={ value === undefined ? null : value }
-                        onChange={onChange}
-                        
-                        renderInput={(params) => 
-                            <TextField 
-                                {...params}
-                                id={props.id}
-                                size={props.size}
-                                sx={props.sx}
-                            />
-                        }
+                            label={props.label}
+                            inputFormat={props.inputFormat}
+                            value={ value === undefined ? null : value }
+                            onChange={onChange}
+                            
+                            renderInput={(params) => 
+                                <TextField 
+                                    {...params}
+                                    id={props.id}
+                                    size={props.size}
+                                    sx={props.sx}
+                                    error={false}
+                                />
+                            }
                         />
                     </LocalizationProvider>
                 )
