@@ -7,8 +7,6 @@ import { Controller } from "react-hook-form";
 import dayjs from "dayjs";
 
 export default function DateField (props: any) {
-    let a = dayjs();
-
     return <Controller
         name={props.name}
         control={props.control}
@@ -18,7 +16,7 @@ export default function DateField (props: any) {
                         <DesktopDatePicker
                             label={props.label}
                             inputFormat={props.inputFormat}
-                            value={ value === undefined ? null : value }
+                            value={ props.value === undefined ? null : props.value }
                             onChange={onChange}
                             
                             renderInput={(params) => 

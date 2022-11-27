@@ -6,15 +6,15 @@ import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import { GridActionsCellItem, GridColumns, GridSortModel, GridValueGetterParams } from '@mui/x-data-grid';
 
-import React, { Fragment, useState } from "react";
+import React, { Fragment, Ref, useRef, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 
 import Procdef from "../model/procdef";
 import ProcdefDto from "../model/procdef_dto";
-import {PageDto, Pagination as ProcdefPg} from "../../../common/model/pagination";
+import { PageDto, Pagination as ProcdefPg } from "../../../common/model/pagination";
 import ProcdefService from "../service/procdef_service";
 import PageDataGrid from "../../../common/component/data_grid";
-import {utc_to_dt} from "../../../common/util/datetime";
+import { utc_to_dt } from "../../../common/util/datetime";
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import QueryDialog from "../../../common/component/query_dialog";
@@ -38,6 +38,11 @@ export default function DeployManagement() {
     const [procdefPg, setProcdefPg] = useState<ProcdefPg<Procdef>>(defaultPg);
     const [openQuery, setOpenQuery] = useState<boolean>(false);
 
+    type ResetHandle = React.ElementRef<typeof QueryDialog>;
+    const queryDialogRef = useRef<ResetHandle>(null);
+
+    const [doAdvQuery, setDoAdvQuery] = useState<boolean>(false);
+
     const {
         register,
         handleSubmit,
@@ -59,7 +64,7 @@ export default function DeployManagement() {
         },
         {
             field: 'version',
-            headerName:'版本号',
+            headerName: '版本号',
             width: 80,
         },
         {
@@ -76,7 +81,7 @@ export default function DeployManagement() {
             field: 'suspension_state',
             headerName: '是否挂起',
             width: 80,
-            valueGetter: (params: GridValueGetterParams) => 
+            valueGetter: (params: GridValueGetterParams) =>
                 `${params.row.suspension_state == 0 ? "否" : "是"}`,
         },
         {
@@ -87,53 +92,38 @@ export default function DeployManagement() {
                 `${utc_to_dt(params.row.deploy_time).toLocaleString('zh-CN')}`,
         },
         {
-          field: 'actions',
-          type: 'actions',
-          width: 100,
-          getActions: () => [
-            <GridActionsCellItem icon={<EditIcon />} label="Edit" />,
-            <GridActionsCellItem icon={<DeleteIcon />} label="Delete" />,
-          ],
+            field: 'actions',
+            type: 'actions',
+            width: 100,
+            getActions: () => [
+                <GridActionsCellItem icon={<EditIcon />} label="Edit" />,
+                <GridActionsCellItem icon={<DeleteIcon />} label="Delete" />,
+            ],
         },
     ];
-        
+
     const handlePageQuery: SubmitHandler<ProcdefDto> = (procdef_dto) => {
         pg_dto.data = procdef_dto;
         pg_dto.page_no = 0;
 
-        ProcdefService.page_query(pg_dto)
-            .then((result: any) => {
-                let rst = result as ProcdefPg<Procdef>;
-
-                setProcdefPg(rst);
-            }
-        );
+        handleResetQueryDialog();
+        pageQuery(pg_dto);
     };
 
-    const handleChangePageNo: (pageNo: number) => void = (pageNo) => { 
+    const handleChangePageNo: (pageNo: number) => void = (pageNo) => {
         if (pg_dto.data != null) {
             pg_dto.page_no = pageNo;
 
-            ProcdefService.page_query(pg_dto)
-                .then((result: any) => {
-                    let rst = result as ProcdefPg<Procdef>;
-                    setProcdefPg(result);
-                }
-            );
+            pageQuery(pg_dto);
         }
     };
 
-    const handlePageSizeChange: (size: number) => void = (size) => { 
+    const handlePageSizeChange: (size: number) => void = (size) => {
         if (pg_dto.data != null) {
             pg_dto.page_size = size;
             pg_dto.page_no = 0;
 
-            ProcdefService.page_query(pg_dto)
-                .then((result: any) => {
-                    let rst = result as ProcdefPg<Procdef>;
-                    setProcdefPg(result);
-                }
-            );
+            pageQuery(pg_dto);
         }
     }
 
@@ -141,12 +131,16 @@ export default function DeployManagement() {
         pg_dto.sort_model = newSortModel;
         pg_dto.page_no = 0;
 
+        pageQuery(pg_dto);
+    }
+
+    const pageQuery = (dto: PageDto<ProcdefDto>) => {
         ProcdefService.page_query(pg_dto)
             .then((result: any) => {
                 let rst = result as ProcdefPg<Procdef>;
                 setProcdefPg(rst);
             }
-        );
+            );
     }
 
     const handleNewBpmn: () => void = () => {
@@ -157,46 +151,60 @@ export default function DeployManagement() {
         setOpenQuery(true);
     }
 
+    const handleResetQueryDialog: () => void = () => {
+        if (queryDialogRef.current) {
+            queryDialogRef.current.reset()
+        }
+    }
+
     const handleCloseQuery: () => void = () => {
         setOpenQuery(false);
     }
 
-    const handleQuery: (dto: ProcdefDto) => void = () => {
-        // todo
+    const handleQueryDialog: (dto: ProcdefDto) => void = (dto) => {
+        pg_dto.data = dto;
+        pg_dto.page_no = 0;
+
+        pageQuery(pg_dto);
+
+        setDoAdvQuery(true);
         setOpenQuery(false);
     }
 
+    const handleQueryDialogReset: () => void = () => {
+        setDoAdvQuery(false);
+    }
+
     const fields = [
-        {name: "id", label:"ID", type: "number", value: null},
-        {name: "name", label:"流程名称", type: "text", value: null},
-        {name: "deploy_time_from", label:"流程名称", type: "text", value: null},
-        {name: "deploy_time_to", label:"流程名称", type: "text", value: null},
-        {name: "id", label:"ID", type: "text", value: null},
-        {name: "name", label:"流程名称", type: "text", value: null},
-        {name: "deploy_time_from", label:"流程名称", type: "date", value: null},
-        {name: "deploy_time_to", label:"流程名称", type: "text", value: null},
-        {name: "id", label:"ID", type: "text", value: null},
-        {name: "name", label:"流程名称", type: "text", value: null},
-        {name: "deploy_time_from", label:"流程名称", type: "date", value: null},
-        {name: "deploy_time_to", label:"流程名称", type: "date", value: null},
+        { name: "id", label: "ID", type: "text" },
+        { name: "name", label: "流程名称", type: "text" },
+        { name: "deploy_time_from", label: "发布日期From", type: "date" },
+        { name: "deploy_time_to", label: "发布日期To", type: "date" },
     ];
 
     return (
         <Fragment>
             <QueryDialog
+                ref={queryDialogRef}
                 open={openQuery}
                 fields={fields}
-                onClose={handleCloseQuery} 
-                onQuery={handleQuery}
+                onClose={handleCloseQuery}
+                onQuery={handleQueryDialog}
+                onReset={handleQueryDialogReset}
             />
-            <Box sx={{width: '100%'}}>
+            <Box sx={{ width: '100%' }}>
                 <Toolbar>
                     <Typography variant="h5" noWrap component="div" >
-                            流程管理
+                        流程管理
                     </Typography>
                     <Stack direction="row" spacing={0} ml={2}>
                         <Button onClick={handleNewBpmn}>新增流程</Button>
-                        <Button onClick={handleOpenQuery}>高级查询</Button>
+                        {
+                            doAdvQuery
+                                ? <Button onClick={handleOpenQuery} sx={{fontWeight: "bolder", fontSize: 16}}>高级查询</Button>
+                                : <Button onClick={handleOpenQuery} >高级查询</Button>
+                        }
+
                     </Stack>
                 </Toolbar>
                 <Box component="form" onSubmit={handleSubmit(handlePageQuery)} noValidate ml={2} mr={2} >
@@ -232,7 +240,7 @@ export default function DeployManagement() {
                         <Button variant="contained" type='submit'>查询</Button>
                     </Stack>
                     <Box mt={2} style={{ height: 700, width: '100%' }}>
-                        <PageDataGrid 
+                        <PageDataGrid
                             rows={procdefPg.data}
                             columns={columns}
                             page={procdefPg.page_no + 1}

@@ -1,20 +1,40 @@
 import Dialog from '@mui/material/Dialog';
 import { Box, Grid, Breakpoint, Button, DialogTitle, ModalProps, Stack, TextField } from '@mui/material';
-// import Grid from '@mui/material/Unstable_Grid2';
-import React, { Fragment } from "react";
+import React, { Fragment, Ref, RefAttributes, RefObject, useImperativeHandle, useRef } from "react";
 import QueryField from "../model/query";
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { MapSchema, asSchema } from '../util/type_schema';
 import DateField from "../component/date_field";
+import { Dayjs } from 'dayjs';
 
 // const personSchema = { name: 'string', age: 'number', bd: 'date' } as const;
 // const personSchema = asSchema({ name: 'string', age: 'integer' }); // right type now
 // type Person = MapSchema<typeof personSchema>;
 // useForm<Person>();
 
-export default function QueryDialog<T>(props: QueryDialogProps<T>) {
+type ResetHandle = {
+    reset: () => void,
+}
+
+const QueryDialog : React.ForwardRefRenderFunction<ResetHandle, QueryDialogProps> = (props, forwardedRef) => {
     let fields = props.fields;
     let fieldTypeMap: { [index: string]: any } = {};
+
+    React.useImperativeHandle(forwardedRef, () => ({
+        reset: handleReset
+    }));
+
+    function handleReset() {
+        reset(formValues => {
+            for (var key in formValues) {
+                formValues[key] = null;
+            }
+
+            return formValues;
+        });
+
+        props.onReset && props.onReset();
+    }
 
     for (var item of fields) {
         fieldTypeMap[item.name] = item.type;
@@ -23,14 +43,11 @@ export default function QueryDialog<T>(props: QueryDialogProps<T>) {
     let fieldTypeSchema = asSchema(fieldTypeMap);
     type fieldType = MapSchema<typeof fieldTypeSchema>;
 
-    interface AbType {
-        id: string
-    }
-
     const {
         register,
         handleSubmit,
         control,
+        reset,
     } = useForm<fieldType>();
 
     const handleClose = () => {
@@ -39,9 +56,21 @@ export default function QueryDialog<T>(props: QueryDialogProps<T>) {
         }
     };
 
-
     const handleQuery: SubmitHandler<fieldType> = (data) => {
-        console.log(data);
+        // console.log(data);
+        let rst: { [index: string]: any } = {};
+        for (var key in data) {
+            if (fieldTypeMap[key] == "text") {
+                rst[key] = data[key] as string;
+            } else if (fieldTypeMap[key] == "number") {
+                rst[key] = data[key] as number;
+            } else if (fieldTypeMap[key] == "date") {
+                let tmp = data[key] as Dayjs;
+                rst[key] = tmp ? tmp.valueOf() : null;
+            }
+        }
+
+        props.onQuery && props.onQuery(rst);
     }
 
     const title = "查询条件";
@@ -49,17 +78,18 @@ export default function QueryDialog<T>(props: QueryDialogProps<T>) {
     return (
         <Fragment>
             <Dialog
-                fullWidth={true} 
+                fullWidth={true}
                 maxWidth={"lg"}
                 open={props.open}
                 onClose={handleClose}
             >
                 <DialogTitle>{props.title || title}</DialogTitle>
 
-                <Box 
-                    noValidate 
-                    component="form" 
+                <Box
+                    noValidate
+                    component="form"
                     onSubmit={handleSubmit(handleQuery)}
+                    onReset={handleReset}
                     sx={{
                         display: 'flex',
                         flexDirection: 'column',
@@ -69,7 +99,7 @@ export default function QueryDialog<T>(props: QueryDialogProps<T>) {
                         alignContent: 'center',
                     }}
                 >
-                    <Grid container spacing={2} sx={{ width: '100%', paddingLeft:5 }}>
+                    <Grid container spacing={2} sx={{ width: '100%', paddingLeft: 5 }}>
                         {
                             props.fields.map(
                                 (field) => {
@@ -77,7 +107,7 @@ export default function QueryDialog<T>(props: QueryDialogProps<T>) {
 
                                     if (field.type == "date") {
                                         inputField = (
-                                            <DateField 
+                                            <DateField
                                                 id={field.id}
                                                 name={field.name}
                                                 label={field.label}
@@ -85,6 +115,7 @@ export default function QueryDialog<T>(props: QueryDialogProps<T>) {
                                                 size='small'
                                                 inputFormat='YYYY/MM/DD'
                                                 control={control}
+                                                value={field.value}
                                             />
                                         );
                                     } else {
@@ -94,6 +125,7 @@ export default function QueryDialog<T>(props: QueryDialogProps<T>) {
                                                 type={field.type}
                                                 id={field.id}
                                                 size='small'
+                                                value={field.value}
                                                 {...register(field.name)}
                                             />
                                         );
@@ -110,6 +142,7 @@ export default function QueryDialog<T>(props: QueryDialogProps<T>) {
                     </Grid>
                     <Stack direction="row" spacing={2} mt={3} mb={2}>
                         <Button variant="contained" type='submit'>查询</Button>
+                        <Button variant="contained" type='reset'>重置</Button>
                         <Button onClick={handleClose} variant="contained">关闭窗口</Button>
                     </Stack>
 
@@ -119,12 +152,15 @@ export default function QueryDialog<T>(props: QueryDialogProps<T>) {
     );
 }
 
-interface QueryDialogProps<Dto> {
+interface QueryDialogProps {
     title?: string,
     fullWidth?: boolean;
     maxWidth?: Breakpoint | false;
     fields: Array<QueryField>
     open: ModalProps['open'],
-    onClose?: () => void;
-    onQuery?: (dto: Dto) => void;
+    onClose?: () => void,
+    onQuery?: (dto: any) => void,
+    onReset?: () => void,
 }
+
+export default React.forwardRef(QueryDialog);

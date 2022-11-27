@@ -5,10 +5,4 @@ export default class QueryField {
     public type: string = "";
     public options?: Array<any>;
     public value?: any;
-
-    // public reset()  {
-    //     if (this.value) {
-    //         this.value = null;
-    //     }
-    // }
 }
