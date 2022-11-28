@@ -180,7 +180,7 @@ export default function DeployManagement() {
         // { name: "id", label: "ID", type: "string", input:"text" },
         // { name: "name", label: "流程名称", type: "string", input:"text" },
         // { name: "deploy_time_from", label: "发布日期From", type: "date", input:"date" },
-        // { name: "deploy_time_to", label: "发布日期To", type: "date", input:"date" },
+        { name: "deploy_time_to", label: "发布日期To", type: "date", input:"date" },
         { name: "suspension_state", label: "是否挂起", type: "number", input:"select", options: [ { value: 0, label: "否" }, { value: 1, label: "是" } ]},
     ];
 

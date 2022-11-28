@@ -121,13 +121,12 @@ const QueryDialog: React.ForwardRefRenderFunction<ResetHandle, QueryDialogProps>
                                             />
                                         );
                                     } else if (field.input == "select") {
-                                        inputField  = ( 
+                                        inputField = ( 
                                             <SelectField
                                                 id={field.id}
                                                 name={field.name}
                                                 label={field.label}
                                                 size='small'
-                                                control={control}
                                                 value={field.value}
                                                 options={field.options}
                                             />
