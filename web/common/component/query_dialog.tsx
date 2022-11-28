@@ -121,38 +121,6 @@ const QueryDialog: React.ForwardRefRenderFunction<ResetHandle, QueryDialogProps>
                                             />
                                         );
                                     } else if (field.input == "select") {
-                                        // let formControlId = generate(16);
-                                        // let items: Array<any> = [(
-                                        //     <MenuItem value=""> - 请选择 - </MenuItem>
-                                        // )];
-                                        // items.push((
-                                        //     field.options && field.options.map((s: InputOption) => {
-                                        //         return <MenuItem value={s.value}>{s.label || s.value}</MenuItem>
-                                        //     })
-                                        // ));
-                                        // inputField = (
-                                        //     <FormControl fullWidth sx={{ width: 250 }} >
-                                        //         <InputLabel id={formControlId} >{field.label}</InputLabel>
-                                        //         <Select
-                                        //             labelId={formControlId}
-                                        //             id={field.id}
-                                        //             size='small'
-                                        //             label={field.label}
-                                        //             sx={{transform:"translate(0px, 8px)"}}
-                                        //             {...register(field.name)}
-                                        //         > 
-                                        //             {items}
-                                        //         </Select>
-                                        //     </FormControl>
-                                        // );
-
-                                        // inputField = (
-                                        //     <SelectField 
-                                        //         id={field.id}
-                                        //         label={field.label}
-                                        //         value={field.value}
-                                        //         options={field.options}
-                                        //     />
                                         inputField  = ( 
                                             <SelectField
                                                 id={field.id}
