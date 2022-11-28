@@ -16,7 +16,7 @@ export default function DateField (props: any) {
                         <DesktopDatePicker
                             label={props.label}
                             inputFormat={props.inputFormat}
-                            value={ props.value === undefined ? null : props.value }
+                            value={ value === undefined ? null : value }
                             onChange={onChange}
                             
                             renderInput={(params) => 

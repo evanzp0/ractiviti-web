@@ -1,8 +1,27 @@
-export default class QueryField {
-    public id?: string;
-    public label: string = "";
-    public name: string = "";
-    public type: string = "";
-    public options?: Array<any>;
-    public value?: any;
+import { Breakpoint, ModalProps } from "@mui/material";
+
+export interface QueryField {
+    id?: string,
+    label: string,
+    name: string,
+    type: "string" | "number" | "date",
+    input: "text" | "number" | "date" | "select",
+    options?: Array<InputOption>;
+    value?: any;
+}
+
+export interface QueryDialogProps {
+    title?: string,
+    fullWidth?: boolean;
+    maxWidth?: Breakpoint | false;
+    fields: Array<QueryField>
+    open: ModalProps['open'],
+    onClose?: () => void,
+    onQuery?: (dto: any) => void,
+    onReset?: () => void,
+}
+
+export interface InputOption {
+    value: string | number,
+    label?: string,
 }

@@ -18,6 +18,7 @@ import { utc_to_dt } from "../../../common/util/datetime";
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import QueryDialog from "../../../common/component/query_dialog";
+import { QueryField } from "../../../common/model/query";
 
 let defaultPg: ProcdefPg<Procdef> = {
     page_no: 0,
@@ -175,11 +176,12 @@ export default function DeployManagement() {
         setDoAdvQuery(false);
     }
 
-    const fields = [
-        { name: "id", label: "ID", type: "text" },
-        { name: "name", label: "流程名称", type: "text" },
-        { name: "deploy_time_from", label: "发布日期From", type: "date" },
-        { name: "deploy_time_to", label: "发布日期To", type: "date" },
+    const fields: Array<QueryField> = [
+        { name: "id", label: "ID", type: "string", input:"text" },
+        { name: "name", label: "流程名称", type: "string", input:"text" },
+        { name: "deploy_time_from", label: "发布日期From", type: "date", input:"date" },
+        { name: "deploy_time_to", label: "发布日期To", type: "date", input:"date" },
+        { name: "suspension_state", label: "是否挂起", type: "number", input:"select", options: [ { value: 0, label: "否" }, { value: 1, label: "是" } ]},
     ];
 
     return (

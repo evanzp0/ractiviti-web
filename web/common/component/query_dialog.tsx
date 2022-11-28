@@ -1,11 +1,12 @@
 import Dialog from '@mui/material/Dialog';
-import { Box, Grid, Breakpoint, Button, DialogTitle, ModalProps, Stack, TextField } from '@mui/material';
-import React, { Fragment, Ref, RefAttributes, RefObject, useImperativeHandle, useRef } from "react";
-import QueryField from "../model/query";
+import { Box, Grid, Button, DialogTitle, ModalProps, Stack, TextField, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
+import React, { Fragment } from "react";
+import { QueryDialogProps, InputOption } from "../model/query";
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { MapSchema, asSchema } from '../util/type_schema';
 import DateField from "../component/date_field";
 import { Dayjs } from 'dayjs';
+import {generate} from 'randomized-string'
 
 // const personSchema = { name: 'string', age: 'number', bd: 'date' } as const;
 // const personSchema = asSchema({ name: 'string', age: 'integer' }); // right type now
@@ -16,7 +17,7 @@ type ResetHandle = {
     reset: () => void,
 }
 
-const QueryDialog : React.ForwardRefRenderFunction<ResetHandle, QueryDialogProps> = (props, forwardedRef) => {
+const QueryDialog: React.ForwardRefRenderFunction<ResetHandle, QueryDialogProps> = (props, forwardedRef) => {
     let fields = props.fields;
     let fieldTypeMap: { [index: string]: any } = {};
 
@@ -57,7 +58,7 @@ const QueryDialog : React.ForwardRefRenderFunction<ResetHandle, QueryDialogProps
     };
 
     const handleQuery: SubmitHandler<fieldType> = (data) => {
-        // console.log(data);
+        console.log(data);
         let rst: { [index: string]: any } = {};
         for (var key in data) {
             if (fieldTypeMap[key] == "text") {
@@ -105,7 +106,7 @@ const QueryDialog : React.ForwardRefRenderFunction<ResetHandle, QueryDialogProps
                                 (field) => {
                                     let inputField;
 
-                                    if (field.type == "date") {
+                                    if (field.input == "date") {
                                         inputField = (
                                             <DateField
                                                 id={field.id}
@@ -115,8 +116,32 @@ const QueryDialog : React.ForwardRefRenderFunction<ResetHandle, QueryDialogProps
                                                 size='small'
                                                 inputFormat='YYYY/MM/DD'
                                                 control={control}
-                                                value={field.value}
                                             />
+                                        );
+                                    } else if (field.input == "select") {
+                                        let formControlId = generate(16);
+                                        let items: Array<any> = [(
+                                            <MenuItem value=""> - 请选择 - </MenuItem>
+                                        )];
+                                        items.push((
+                                            field.options && field.options.map((s: InputOption) => {
+                                                return <MenuItem value={s.value}>{s.label || s.value}</MenuItem>
+                                            })
+                                        ));
+                                        inputField = (
+                                            <FormControl fullWidth sx={{ width: 250 }} >
+                                                <InputLabel id={formControlId} >{field.label}</InputLabel>
+                                                <Select
+                                                    labelId={formControlId}
+                                                    id={field.id}
+                                                    size='small'
+                                                    label={field.label}
+                                                    sx={{transform:"translate(0px, 8px)"}}
+                                                    {...register(field.name)}
+                                                > 
+                                                    {items}
+                                                </Select>
+                                            </FormControl>
                                         );
                                     } else {
                                         inputField = (
@@ -125,7 +150,6 @@ const QueryDialog : React.ForwardRefRenderFunction<ResetHandle, QueryDialogProps
                                                 type={field.type}
                                                 id={field.id}
                                                 size='small'
-                                                value={field.value}
                                                 {...register(field.name)}
                                             />
                                         );
@@ -150,17 +174,6 @@ const QueryDialog : React.ForwardRefRenderFunction<ResetHandle, QueryDialogProps
             </Dialog>
         </Fragment>
     );
-}
-
-interface QueryDialogProps {
-    title?: string,
-    fullWidth?: boolean;
-    maxWidth?: Breakpoint | false;
-    fields: Array<QueryField>
-    open: ModalProps['open'],
-    onClose?: () => void,
-    onQuery?: (dto: any) => void,
-    onReset?: () => void,
 }
 
 export default React.forwardRef(QueryDialog);
