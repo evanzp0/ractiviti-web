@@ -1,6 +1,6 @@
-import { InputLabel, MenuItem, Select, FormControl, SelectChangeEvent } from "@mui/material";
+import { InputLabel, MenuItem, Select, FormControl, SelectChangeEvent, TextField } from "@mui/material";
 import { generate } from "randomized-string";
-import React from "react";
+import React, { ChangeEventHandler } from "react";
 import { InputOption } from "../model/query";
 
 let _selectedValue: string = "";
@@ -19,23 +19,21 @@ export default function SelectField(props: any) {
 
     let formControlId = generate(16);
 
-    const handleChange = (event: SelectChangeEvent<string>) => {
+    const handleChange: ChangeEventHandler<HTMLInputElement> = (event) => {
         _selectedValue = event.target.value;
         setSelectedValue(_selectedValue);
     };
 
     return <FormControl fullWidth sx={{ width: 250 }}>
-        <InputLabel id={formControlId} >{props.label}</InputLabel>
-        <Select
-            labelId={formControlId}
+        <TextField
             id={props.id}
-            size='small'
             label={props.label}
-            sx={{ transform: "translate(0px, 8px)" }}
             value={selectedValue}
+            size="small"
+            select
             onChange={handleChange}
         >
             {menuItems}
-        </Select>
+        </TextField>
     </FormControl>
 }
