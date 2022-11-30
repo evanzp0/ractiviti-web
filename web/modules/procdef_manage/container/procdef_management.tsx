@@ -273,7 +273,7 @@ export default function DeployManagement() {
                             {...register('deployment_id')}
                         />
                         <Button variant="contained" type='submit'>查询</Button>
-                        <Button variant="contained" type='reset'>reset</Button>
+                        <Button variant="contained" type='reset'>重置</Button>
                     </Stack>
                     <Box mt={2} style={{ height: 700, width: '100%' }}>
                         <PageDataGrid
