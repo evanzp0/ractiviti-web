@@ -21,25 +21,27 @@ type ResetHandle = {
 const QueryDialog: React.ForwardRefRenderFunction<ResetHandle, QueryDialogProps> = (props, forwardedRef) => {
     let fields = props.fields;
     let fieldTypeMap: { [index: string]: any } = {};
+    let fieldDefaultValueMap: { [index: string]: any } = {};
 
     React.useImperativeHandle(forwardedRef, () => ({
         reset: handleReset
     }));
 
     function handleReset() {
-        reset(formValues => {
-            for (var key in formValues) {
-                formValues[key] = null;
-            }
+        // reset(formValues => {
+        //     for (var key in formValues) {
+        //         formValues[key] = null;
+        //     }
 
-            return formValues;
-        });
+        //     return formValues;
+        // });
 
-        props.onReset && props.onReset();
+        reset();
     }
 
     for (var item of fields) {
         fieldTypeMap[item.name] = item.type;
+        fieldDefaultValueMap[item.name] = item.value || null;
     }
 
     let fieldTypeSchema = asSchema(fieldTypeMap);
@@ -50,7 +52,7 @@ const QueryDialog: React.ForwardRefRenderFunction<ResetHandle, QueryDialogProps>
         handleSubmit,
         control,
         reset,
-    } = useForm<fieldType>();
+    } = useForm<fieldType>({defaultValues: fieldDefaultValueMap});
 
     const handleClose = () => {
         if (props.onClose) {
@@ -111,24 +113,25 @@ const QueryDialog: React.ForwardRefRenderFunction<ResetHandle, QueryDialogProps>
                                         inputField = (
                                             <DateField
                                                 id={field.id}
-                                                name={field.name}
                                                 label={field.label}
                                                 sx={{ width: 250 }}
                                                 size='small'
                                                 inputFormat='YYYY/MM/DD'
                                                 control={control}
                                                 value={field.value}
+                                                {...register(field.name)}
                                             />
                                         );
                                     } else if (field.input == "select") {
                                         inputField = ( 
                                             <SelectField
                                                 id={field.id}
-                                                name={field.name}
                                                 label={field.label}
                                                 size='small'
                                                 value={field.value}
                                                 options={field.options}
+                                                control={control}
+                                                {...register(field.name)}
                                             />
                                         );
                                     } else {
