@@ -7,7 +7,7 @@ import Typography from "@mui/material/Typography";
 import { GridActionsCellItem, GridColumns, GridSortModel, GridValueGetterParams } from '@mui/x-data-grid';
 
 import React, { Fragment, Ref, useRef, useState } from "react";
-import { SubmitHandler, useForm } from "react-hook-form";
+import { DefaultValues, SubmitHandler, useForm } from "react-hook-form";
 
 import Procdef from "../model/procdef";
 import ProcdefDto from "../model/procdef_dto";
@@ -44,11 +44,22 @@ export default function DeployManagement() {
 
     const [doAdvQuery, setDoAdvQuery] = useState<boolean>(false);
 
+    let defaultValues: DefaultValues<ProcdefDto> = {
+        id: "",
+        name:  "",
+        key: "",
+        deployment_id: "",
+        deployer_name: "",
+        company_name: "",
+        suspension_state: null,
+    };
+
     const {
         register,
         handleSubmit,
+        reset,
         control,
-    } = useForm<ProcdefDto>();
+    } = useForm<ProcdefDto>({defaultValues});
 
     const columns: GridColumns = [
         { field: 'id', headerName: '流程定义ID', width: 300 },
@@ -176,6 +187,21 @@ export default function DeployManagement() {
         setDoAdvQuery(false);
     }
 
+    const handleReset: () => void = () => {
+        // reset((formValues: any) => {
+        //     for (var k in formValues) {
+        //         formValues[k] = null;
+        //     }
+
+        //     return {
+        //         ...formValues
+        //     }
+        // });
+
+        reset();
+    }
+    
+
     const fields: Array<QueryField> = [
         // { name: "id", label: "ID", type: "string", input:"text" },
         // { name: "name", label: "流程名称", type: "string", input:"text" },
@@ -209,7 +235,14 @@ export default function DeployManagement() {
 
                     </Stack>
                 </Toolbar>
-                <Box component="form" onSubmit={handleSubmit(handlePageQuery)} noValidate ml={2} mr={2} >
+                <Box 
+                    component="form" 
+                    onSubmit={handleSubmit(handlePageQuery)}
+                    onReset={handleReset}
+                    noValidate 
+                    ml={2} 
+                    mr={2} 
+                >
                     <Stack direction="row" spacing={1} >
                         <TextField
                             label="流程ID"
@@ -240,6 +273,7 @@ export default function DeployManagement() {
                             {...register('deployment_id')}
                         />
                         <Button variant="contained" type='submit'>查询</Button>
+                        <Button variant="contained" type='reset'>reset</Button>
                     </Stack>
                     <Box mt={2} style={{ height: 700, width: '100%' }}>
                         <PageDataGrid

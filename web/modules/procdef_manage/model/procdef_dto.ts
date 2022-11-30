@@ -5,5 +5,5 @@ export default interface ProcdefDto {
     deployment_id: string,
     deployer_name: string,
     company_name: string,
-    suspension_state: number,
+    suspension_state: number | null,
 }
