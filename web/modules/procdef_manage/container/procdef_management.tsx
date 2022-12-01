@@ -1,13 +1,12 @@
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Stack from "@mui/material/Stack";
-import TextField from "@mui/material/TextField";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import { GridActionsCellItem, GridColumns, GridSortModel, GridValueGetterParams } from '@mui/x-data-grid';
 
 import React, { Fragment, Ref, useRef, useState } from "react";
-import { DefaultValues, SubmitHandler, useForm } from "react-hook-form";
+import { SubmitHandler, useForm } from "react-hook-form";
 
 import Procdef from "../model/procdef";
 import ProcdefDto from "../model/procdef_dto";
@@ -18,6 +17,7 @@ import { utc_to_dt } from "../../../common/util/datetime";
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import QueryDialog from "../../../common/component/query_dialog";
+import QueryBar from "../../../common/component/query_bar";
 import { QueryField } from "../../../common/model/query";
 
 let defaultPg: ProcdefPg<Procdef> = {
@@ -39,17 +39,12 @@ export default function DeployManagement() {
     const [procdefPg, setProcdefPg] = useState<ProcdefPg<Procdef>>(defaultPg);
     const [openQuery, setOpenQuery] = useState<boolean>(false);
 
-    type ResetHandle = React.ElementRef<typeof QueryDialog>;
-    const queryDialogRef = useRef<ResetHandle>(null);
+    type QdResetHandle = React.ElementRef<typeof QueryDialog>;
+    const queryDialogRef = useRef<QdResetHandle>(null);
+    type QbResetHandle = React.ElementRef<typeof QueryBar>;
+    const queryBarRef = useRef<QbResetHandle>(null);
 
     const [doAdvQuery, setDoAdvQuery] = useState<boolean>(false);
-
-    const {
-        register,
-        handleSubmit,
-        reset,
-        control,
-    } = useForm<ProcdefDto>();
 
     const columns: GridColumns = [
         { field: 'id', headerName: '流程定义ID', width: 300 },
@@ -68,6 +63,11 @@ export default function DeployManagement() {
             field: 'version',
             headerName: '版本号',
             width: 80,
+        },
+        {
+            field: 'deployment_id',
+            headerName: '发布日志ID',
+            width: 300,
         },
         {
             field: 'company_name',
@@ -109,6 +109,7 @@ export default function DeployManagement() {
         pg_dto.page_no = 0;
 
         handleResetQueryDialog();
+        setDoAdvQuery(false);
         pageQuery(pg_dto);
     };
 
@@ -159,6 +160,12 @@ export default function DeployManagement() {
         }
     }
 
+    const handleResetQueryBar: () => void = () => {
+        if (queryBarRef.current) {
+            queryBarRef.current.reset()
+        }
+    }
+
     const handleCloseQuery: () => void = () => {
         setOpenQuery(false);
     }
@@ -169,33 +176,26 @@ export default function DeployManagement() {
 
         pageQuery(pg_dto);
 
+        handleResetQueryBar();
+        
         setDoAdvQuery(true);
         setOpenQuery(false);
     }
 
-    const handleQueryDialogReset: () => void = () => {
-        setDoAdvQuery(false);
-    }
+    const queryFields: Array<QueryField> = [
+        { name: "id", label: "流程ID", type: "string", input:"text" },
+        { name: "name", label: "流程名称", type: "string", input:"text" },
+        { name: "key", label: "流程KEY", type: "string", input:"text" },
+        { name: "deployment_id", label: "发布日志ID", type: "string", input:"text" },
+        { name: "suspension_state", label: "是否挂起", type: "number", input:"select", options: [ { value: 0, label: "否" }, { value: 1, label: "是" } ]},
+    ];
 
-    const handleReset: () => void = () => {
-        // reset((formValues: any) => {
-        //     for (var k in formValues) {
-        //         formValues[k] = null;
-        //     }
-
-        //     return {
-        //         ...formValues
-        //     }
-        // });
-
-        reset();
-    }
-    
-
-    const fields: Array<QueryField> = [
-        // { name: "id", label: "ID", type: "string", input:"text" },
-        // { name: "name", label: "流程名称", type: "string", input:"text" },
-        // { name: "deploy_time_from", label: "发布日期From", type: "date", input:"date" },
+    const advQueryFields: Array<QueryField> = [
+        { name: "id", label: "ID", type: "string", input:"text" },
+        { name: "name", label: "流程名称", type: "string", input:"text" },
+        { name: "key", label: "流程KEY", type: "string", input:"text" },
+        { name: "deployment_id", label: "发布日志ID", type: "string", input:"text" },
+        { name: "deploy_time_from", label: "发布日期From", type: "date", input:"date" },
         { name: "deploy_time_to", label: "发布日期To", type: "date", input:"date" },
         { name: "suspension_state", label: "是否挂起", type: "number", input:"select", options: [ { value: 0, label: "否" }, { value: 1, label: "是" } ]},
     ];
@@ -205,10 +205,10 @@ export default function DeployManagement() {
             <QueryDialog
                 ref={queryDialogRef}
                 open={openQuery}
-                fields={fields}
+                fields={advQueryFields}
                 onClose={handleCloseQuery}
                 onQuery={handleQueryDialog}
-                onReset={handleQueryDialogReset}
+                onReset={ ()=> setDoAdvQuery(false) }
             />
             <Box sx={{ width: '100%' }}>
                 <Toolbar>
@@ -225,45 +225,14 @@ export default function DeployManagement() {
 
                     </Stack>
                 </Toolbar>
-                <Box 
-                    component="form" 
-                    onSubmit={handleSubmit(handlePageQuery)}
-                    onReset={handleReset}
-                    noValidate 
-                    ml={2} 
-                    mr={2} 
-                >
-                    <Stack direction="row" spacing={1} >
-                        <TextField
-                            label="流程ID"
-                            type="text"
-                            id="id"
-                            size='small'
-                            {...register('id')}
-                        />
-                        <TextField
-                            label="流程名"
-                            type="text"
-                            id="name"
-                            size='small'
-                            {...register('name')}
-                        />
-                        <TextField
-                            label="流程KEY"
-                            type="text"
-                            id="key"
-                            size='small'
-                            {...register('key')}
-                        />
-                        <TextField
-                            label="发布日志ID"
-                            type="text"
-                            id="deployment_id"
-                            size='small'
-                            {...register('deployment_id')}
-                        />
-                        <Button variant="contained" type='submit'>查询</Button>
-                    </Stack>
+                <Box ml={2} mr={2} >
+                    
+                    <QueryBar  
+                        ref={queryBarRef}
+                        fields={queryFields}
+                        onQuery={handlePageQuery} 
+                    />
+
                     <Box mt={2} style={{ height: 700, width: '100%' }}>
                         <PageDataGrid
                             rows={procdefPg.data}

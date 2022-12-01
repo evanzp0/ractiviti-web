@@ -1,12 +1,11 @@
 import Dialog from '@mui/material/Dialog';
-import { Box, Grid, Button, DialogTitle, ModalProps, Stack, TextField, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
+import { Box, Grid, Button, DialogTitle, Stack, TextField} from '@mui/material';
 import React, { Fragment } from "react";
 import { QueryDialogProps, InputOption } from "../model/query";
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { MapSchema, asSchema } from '../util/type_schema';
 import DateField from "../component/date_field";
 import { Dayjs } from 'dayjs';
-import {generate} from 'randomized-string'
 import SelectField from './select_field';
 
 // const personSchema = { name: 'string', age: 'number', bd: 'date' } as const;
@@ -61,10 +60,9 @@ const QueryDialog: React.ForwardRefRenderFunction<ResetHandle, QueryDialogProps>
     };
 
     const handleQuery: SubmitHandler<fieldType> = (data) => {
-        console.log(data);
         let rst: { [index: string]: any } = {};
         for (var key in data) {
-            if (fieldTypeMap[key] == "text") {
+            if (fieldTypeMap[key] == "string") {
                 rst[key] = data[key] as string;
             } else if (fieldTypeMap[key] == "number") {
                 rst[key] = data[key] as number;

@@ -25,3 +25,12 @@ export interface InputOption {
     value: string | number,
     label?: string,
 }
+
+
+export interface QueryBarProps {
+    fullWidth?: boolean;
+    maxWidth?: Breakpoint | false;
+    fields: Array<QueryField>
+    onQuery?: (dto: any) => void,
+    onReset?: () => void,
+}
