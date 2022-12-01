@@ -1,11 +1,11 @@
-use axum::{ routing::{get, post}, Router, };
+use axum::{ routing::{get, post, delete}, Router, };
 
 use crate::{
     api::{
         bpmn::{publish_new_bpmn, get_bpmn, publish_bpmn_by_procdef},
         deployment::deployment_query,
         login::login,
-        password::change_password, prodef::procdef_query,
+        password::change_password, prodef::{procdef_query, delete_procdef_by_id},
     },
     handles::{home, AuthLayer},
 };
@@ -27,6 +27,7 @@ pub fn api_route() -> Router {
 
     let procdef_routes = Router::new()
         .route("/page_query", post(procdef_query))
+        .route("/:proc_def_id", delete(delete_procdef_by_id))
         .layer(AuthLayer::new());
     let procdef_routes = Router::new().nest("/procdef", procdef_routes);
 

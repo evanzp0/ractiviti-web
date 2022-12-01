@@ -97,9 +97,9 @@ export default function DeployManagement() {
             field: 'actions',
             type: 'actions',
             width: 100,
-            getActions: () => [
-                <GridActionsCellItem icon={<EditIcon />} label="Edit" />,
-                <GridActionsCellItem icon={<DeleteIcon />} label="Delete" />,
+            getActions: (params) => [
+                <GridActionsCellItem icon={<EditIcon />} label="Edit" onClick={editProcdef(params.row.id)} />,
+                <GridActionsCellItem icon={<DeleteIcon />} label="Delete" onClick={deleteProcdef(params.row.id)} />,
             ],
         },
     ];
@@ -142,8 +142,7 @@ export default function DeployManagement() {
             .then((result: any) => {
                 let rst = result as ProcdefPg<Procdef>;
                 setProcdefPg(rst);
-            }
-            );
+            });
     }
 
     const handleNewBpmn: () => void = () => {
@@ -177,29 +176,47 @@ export default function DeployManagement() {
         pageQuery(pg_dto);
 
         handleResetQueryBar();
-        
+
         setDoAdvQuery(true);
         setOpenQuery(false);
     }
 
+    const editProcdef = React.useCallback(
+        (procdefId: string) => () => {
+            window.open("/bpmn/" + procdefId + "/edit")
+        },
+        [],
+    );
+
+    const deleteProcdef = React.useCallback(
+        (procdefId: any) => () => {
+            ProcdefService.delete_procdef_by_id(procdefId)
+                .then((result: any) => {
+                    let rst = result as ProcdefPg<Procdef>;
+                    pageQuery(pg_dto);
+                });
+        },
+        [],
+    );
+
     const queryFields: Array<QueryField> = [
-        { name: "id", label: "流程ID", type: "string", input:"text" },
-        { name: "name", label: "流程名称", type: "string", input:"text" },
-        { name: "key", label: "流程KEY", type: "string", input:"text" },
-        { name: "deployment_id", label: "发布日志ID", type: "string", input:"text" },
-        { name: "suspension_state", label: "是否挂起", type: "number", input:"select", options: [ { value: 0, label: "否" }, { value: 1, label: "是" } ]},
+        { name: "id", label: "流程ID", type: "string", input: "text" },
+        { name: "name", label: "流程名称", type: "string", input: "text" },
+        { name: "key", label: "流程KEY", type: "string", input: "text" },
+        { name: "deployment_id", label: "发布日志ID", type: "string", input: "text" },
+        { name: "suspension_state", label: "是否挂起", type: "number", input: "select", options: [{ value: 0, label: "否" }, { value: 1, label: "是" }] },
     ];
 
     const advQueryFields: Array<QueryField> = [
-        { name: "id", label: "流程ID", type: "string", input:"text" },
-        { name: "name", label: "流程名称", type: "string", input:"text" },
-        { name: "key", label: "流程KEY", type: "string", input:"text" },
-        { name: "deployment_id", label: "发布日志ID", type: "string", input:"text" },
-        { name: "deploy_time_from", label: "发布日期From", type: "date", input:"date" },
-        { name: "deploy_time_to", label: "发布日期To", type: "date", input:"date" },
-        { name: "deployer_name", label: "发布人", type: "string", input:"text" },
-        { name: "company_name", label: "发布公司", type: "string", input:"text" },
-        { name: "suspension_state", label: "是否挂起", type: "number", input:"select", options: [ { value: 0, label: "否" }, { value: 1, label: "是" } ]},
+        { name: "id", label: "流程ID", type: "string", input: "text" },
+        { name: "name", label: "流程名称", type: "string", input: "text" },
+        { name: "key", label: "流程KEY", type: "string", input: "text" },
+        { name: "deployment_id", label: "发布日志ID", type: "string", input: "text" },
+        { name: "deploy_time_from", label: "发布日期From", type: "date", input: "date" },
+        { name: "deploy_time_to", label: "发布日期To", type: "date", input: "date" },
+        { name: "deployer_name", label: "发布人", type: "string", input: "text" },
+        { name: "company_name", label: "发布公司", type: "string", input: "text" },
+        { name: "suspension_state", label: "是否挂起", type: "number", input: "select", options: [{ value: 0, label: "否" }, { value: 1, label: "是" }] },
     ];
 
     return (
@@ -210,7 +227,7 @@ export default function DeployManagement() {
                 fields={advQueryFields}
                 onClose={handleCloseQuery}
                 onQuery={handleQueryDialog}
-                onReset={ ()=> setDoAdvQuery(false) }
+                onReset={() => setDoAdvQuery(false)}
             />
             <Box sx={{ width: '100%' }}>
                 <Toolbar>
@@ -221,18 +238,18 @@ export default function DeployManagement() {
                         <Button onClick={handleNewBpmn}>新增流程</Button>
                         {
                             doAdvQuery
-                                ? <Button onClick={handleOpenQuery} sx={{fontWeight: "bolder", fontSize: 16}}>高级查询</Button>
+                                ? <Button onClick={handleOpenQuery} sx={{ fontWeight: "bolder", fontSize: 16 }}>高级查询</Button>
                                 : <Button onClick={handleOpenQuery} >高级查询</Button>
                         }
 
                     </Stack>
                 </Toolbar>
                 <Box ml={2} mr={2} >
-                    
-                    <QueryBar  
+
+                    <QueryBar
                         ref={queryBarRef}
                         fields={queryFields}
-                        onQuery={handlePageQuery} 
+                        onQuery={handlePageQuery}
                     />
 
                     <Box mt={2} style={{ height: 700, width: '100%' }}>
