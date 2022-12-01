@@ -45,7 +45,11 @@ const QueryBar: React.ForwardRefRenderFunction<ResetHandle, QueryBarProps> = (pr
             if (fieldTypeMap[key] == "string") {
                 rst[key] = data[key] as string;
             } else if (fieldTypeMap[key] == "number") {
-                rst[key] = data[key] as number;
+                if (data[key] != "") {
+                    rst[key] = data[key] as number;
+                } else {
+                    rst[key] = null;
+                }
             } else if (fieldTypeMap[key] == "date") {
                 let tmp = data[key] as Dayjs;
                 rst[key] = tmp ? tmp.valueOf() : null;
