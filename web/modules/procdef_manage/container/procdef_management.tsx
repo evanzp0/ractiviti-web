@@ -19,6 +19,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import QueryDialog from "../../../common/component/query_dialog";
 import QueryBar from "../../../common/component/query_bar";
 import { QueryField } from "../../../common/model/query";
+import Confirm from "../../../common/component/confirm_dialog";
 
 let defaultPg: ProcdefPg<Procdef> = {
     page_no: 0,
@@ -189,12 +190,14 @@ export default function DeployManagement() {
     );
 
     const deleteProcdef = React.useCallback(
-        (procdefId: any) => () => {
-            ProcdefService.delete_procdef_by_id(procdefId)
-                .then((result: any) => {
-                    let rst = result as ProcdefPg<Procdef>;
-                    pageQuery(pg_dto);
-                });
+        (procdefId: string) => () => {
+            Confirm("真的要删除该流程定义吗？", () => {
+                ProcdefService.delete_procdef_by_id(procdefId)
+                    .then((result: any) => {
+                        let rst = result as ProcdefPg<Procdef>;
+                        pageQuery(pg_dto);
+                    });
+            });
         },
         [],
     );
@@ -221,6 +224,7 @@ export default function DeployManagement() {
 
     return (
         <Fragment>
+
             <QueryDialog
                 ref={queryDialogRef}
                 open={openQuery}
@@ -229,6 +233,7 @@ export default function DeployManagement() {
                 onQuery={handleQueryDialog}
                 onReset={() => setDoAdvQuery(false)}
             />
+
             <Box sx={{ width: '100%' }}>
                 <Toolbar>
                     <Typography variant="h5" noWrap component="div" >
