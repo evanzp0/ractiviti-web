@@ -37,3 +37,4 @@ tokio-pg-mapper-derive = "0.2"
 tokio-postgres = { version = "0.7", features = ["with-chrono-0_4"] }
 dysql = { path = "../dysql-project/dysql" }
 dysql-macro = { path = "../dysql-project/dysql-macro", features = ["tokio-postgres"] }
+
